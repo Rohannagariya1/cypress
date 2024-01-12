@@ -1,4 +1,4 @@
-import * as head from 'lodash/head'
+import head from 'lodash/head'
 
 module.exports = {
   'e2e': {
