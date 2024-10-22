@@ -27,6 +27,7 @@ import type { RunState, CachedTestState, ProtocolManagerShape } from '@packages/
 import { cors } from '@packages/network'
 import memory from './browsers/memory'
 import { privilegedCommandsManager } from './privileged-commands/privileged-commands-manager'
+import type { Automation } from './automation'
 
 type StartListeningCallbacks = {
   onSocketConnection: (socket: any) => void
@@ -130,7 +131,7 @@ export class SocketBase {
 
   startListening (
     server: DestroyableHttpServer,
-    automation,
+    automation: Automation,
     config,
     options,
     callbacks: StartListeningCallbacks,
