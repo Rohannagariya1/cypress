@@ -6,8 +6,6 @@ import os from 'os'
 import sinon from 'sinon'
 import fsExtra from 'fs-extra'
 import * as firefox from '../../../lib/browsers/firefox'
-// TODO: add bidi tests
-// import firefoxUtil from '../../../lib/browsers/firefox-util'
 import { type Client as WebDriverClient, default as webdriver } from 'webdriver'
 import { EventEmitter } from 'stream'
 import { BidiAutomation } from '../../../lib/browsers/bidi_automation'
@@ -115,6 +113,7 @@ describe('lib/browsers/firefox', () => {
         expect(this.options.onInitializeNewBrowserTab).to.have.been.called
         expect(wdInstance.browsingContextGetTree).to.have.been.calledWith({})
         expect(bidiAutomationClient.setTopLevelContextId).to.have.been.calledWith(mockContextId)
+        expect(this.automation.use).to.have.been.calledWith(bidiAutomationClient)
 
         // Only happens one time when navigating to the spec since the context gets created on about:blank, which is tested in BidiAutomation
         expect(wdInstance.browsingContextNavigate).to.have.been.calledWith({
@@ -284,6 +283,7 @@ describe('lib/browsers/firefox', () => {
 
         // make sure Bidi gets created
         expect(BidiAutomation.create).to.be.calledWith(wdInstance, this.automation)
+        expect(this.automation.use).to.have.been.calledWith(bidiAutomationClient)
         expect(bidiAutomationClient.setTopLevelContextId).to.be.calledWith(mockContextId)
       })
 
