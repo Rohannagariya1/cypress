@@ -68,4 +68,9 @@ workflows:
   # the setup-workflow workflow is always triggered.
   setup-workflow:
     jobs:
-      - verify-ci-should-run
+      # This job will allow for a Cypress member to approve and run the code changes from contributors after being reviewed.
+      - contributor-pr:
+          type: approval
+      - verify-ci-should-run:
+          requires:
+            - contributor-pr
