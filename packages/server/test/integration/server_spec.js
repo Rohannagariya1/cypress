@@ -128,191 +128,69 @@ describe('Server', () => {
     describe('file', () => {
       beforeEach(function () {
         Fixtures.scaffold('no-server')
-      })
 
-      describe('with injectDocumentDomain enabled', () => {
-        beforeEach(function () {
-          return this.setup({
-            projectRoot: Fixtures.projectPath('no-server'),
-            config: {
-              port: 2000,
-              fileServerFolder: 'dev',
-              supportFile: false,
-              e2e: {
-                injectDocumentDomain: true,
-              },
-            },
-          })
-        })
-
-        it('does not inject document.domain, as this is not a cross origin req', async function () {
-          await this.server._onResolveUrl('/index.html', {}, this.automationRequest)
-          const res = await this.rp('http://localhost:2000/index.html')
-
-          expect(res.body).not.to.include('document.domain = \'localhost\'')
-        })
-
-        it('buffers the response', function () {
-          sinon.spy(this.server.request, 'sendStream')
-
-          return this.server._onResolveUrl('/index.html', {}, this.automationRequest)
-          .then((obj = {}) => {
-            expectToEqDetails(obj, {
-              isOkStatusCode: true,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/index.html',
-              originalUrl: '/index.html',
-              filePath: Fixtures.projectPath('no-server/dev/index.html'),
-              status: 200,
-              statusText: 'OK',
-              redirects: [],
-              cookies: [],
-            })
-
-            expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
-          }).then(() => {
-            return this.server._onResolveUrl('/index.html', {}, this.automationRequest)
-            .then((obj = {}) => {
-              expectToEqDetails(obj, {
-                isOkStatusCode: true,
-                isPrimarySuperDomainOrigin: true,
-                isHtml: true,
-                contentType: 'text/html',
-                url: 'http://localhost:2000/index.html',
-                originalUrl: '/index.html',
-                filePath: Fixtures.projectPath('no-server/dev/index.html'),
-                status: 200,
-                statusText: 'OK',
-                redirects: [],
-                cookies: [],
-              })
-
-              expect(this.server.request.sendStream).to.be.calledTwice
-            })
-          }).then(() => {
-            return this.rp('http://localhost:2000/index.html')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
-              expect(res.body).to.include('Cypress')
-
-              expect(this.buffers.buffer).to.be.undefined
-            })
-          })
-        })
-
-        it('can follow static file redirects', function () {
-          return this.server._onResolveUrl('/sub', {}, this.automationRequest)
-          .then((obj = {}) => {
-            return expectToEqDetails(obj, {
-              isOkStatusCode: true,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/sub/',
-              originalUrl: '/sub',
-              filePath: Fixtures.projectPath('no-server/dev/sub/'),
-              status: 200,
-              statusText: 'OK',
-              redirects: ['301: http://localhost:2000/sub/'],
-              cookies: [],
-            })
-          }).then(() => {
-            return this.rp('http://localhost:2000/sub/')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
-
-              expect(this.server.remoteStates.current()).to.deep.eq({
-                auth: undefined,
-                origin: 'http://localhost:2000',
-                strategy: 'file',
-                domainName: 'localhost',
-                fileServer: this.fileServer,
-                props: null,
-              })
-            })
-          })
-        })
-
-        it('gracefully handles 404', function () {
-          return this.server._onResolveUrl('/does-not-exist', {}, this.automationRequest)
-          .then((obj = {}) => {
-            return expectToEqDetails(obj, {
-              isOkStatusCode: false,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/does-not-exist',
-              originalUrl: '/does-not-exist',
-              filePath: Fixtures.projectPath('no-server/dev/does-not-exist'),
-              status: 404,
-              statusText: 'Not Found',
-              redirects: [],
-              cookies: [],
-            })
-          }).then(() => {
-            return this.rp({
-              url: 'http://localhost:2000/does-not-exist',
-              headers: {
-                'Accept-Encoding': 'identity',
-              },
-            })
-            .then((res) => {
-              expect(res.statusCode).to.eq(404)
-              expect(res.body).to.include('Cypress errored trying to serve this file from your system:')
-              expect(res.body).to.include('does-not-exist')
-
-              expect(res.body).to.include('The file was not found')
-            })
-          })
-        })
-
-        it('handles urls with hashes', function () {
-          return this.server._onResolveUrl('/index.html#/foo/bar', {}, this.automationRequest)
-          .then((obj = {}) => {
-            expectToEqDetails(obj, {
-              isOkStatusCode: true,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/index.html',
-              originalUrl: '/index.html',
-              filePath: Fixtures.projectPath('no-server/dev/index.html'),
-              status: 200,
-              statusText: 'OK',
-              redirects: [],
-              cookies: [],
-            })
-
-            expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
-          }).then(() => {
-            return this.rp('http://localhost:2000/index.html')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
-
-              expect(this.buffers.buffer).to.be.undefined
-            })
-          })
+        return this.setup({
+          projectRoot: Fixtures.projectPath('no-server'),
+          config: {
+            port: 2000,
+            fileServerFolder: 'dev',
+            supportFile: false,
+          },
         })
       })
 
-      describe('without injectDocumentDomain enabled', () => {
-        beforeEach(function () {
-          return this.setup({
-            projectRoot: Fixtures.projectPath('no-server'),
-            config: {
-              port: 2000,
-              fileServerFolder: 'dev',
-              supportFile: false,
-            },
-          })
+      it('can serve static assets', async function () {
+        const obj = await this.server._onResolveUrl('/index.html', {}, this.automationRequest)
+
+        await expectToEqDetails(obj, {
+          isOkStatusCode: true,
+          isPrimarySuperDomainOrigin: true,
+          isHtml: true,
+          contentType: 'text/html',
+          url: 'http://localhost:2000/index.html',
+          originalUrl: '/index.html',
+          filePath: Fixtures.projectPath('no-server/dev/index.html'),
+          status: 200,
+          statusText: 'OK',
+          redirects: [],
+          cookies: [],
         })
 
-        it('can serve static assets', async function () {
-          const obj = await this.server._onResolveUrl('/index.html', {}, this.automationRequest)
+        const res = await this.rp('http://localhost:2000/index.html')
 
-          await expectToEqDetails(obj, {
+        expect(res.statusCode).to.eq(200)
+        expect(res.headers['etag']).to.exist
+        expect(res.headers['set-cookie']).not.to.match(/initial=;/)
+        expect(res.headers['cache-control']).to.eq('no-cache, no-store, must-revalidate')
+        expect(res.body).to.include('index.html content')
+        expect(res.body).to.include('.action("app:window:before:load",window)')
+        expect(res.body).to.include('</script>\n  </head>')
+      })
+
+      it('sends back the content type', async function () {
+        const obj = await this.server._onResolveUrl('/assets/foo.json', {}, this.automationRequest)
+
+        await expectToEqDetails(obj, {
+          isOkStatusCode: true,
+          isPrimarySuperDomainOrigin: true,
+          isHtml: false,
+          contentType: 'application/json',
+          url: 'http://localhost:2000/assets/foo.json',
+          originalUrl: '/assets/foo.json',
+          filePath: Fixtures.projectPath('no-server/dev/assets/foo.json'),
+          status: 200,
+          statusText: 'OK',
+          redirects: [],
+          cookies: [],
+        })
+      })
+
+      it('buffers the response', function () {
+        sinon.spy(this.server.request, 'sendStream')
+
+        return this.server._onResolveUrl('/index.html', {}, this.automationRequest)
+        .then((obj = {}) => {
+          expectToEqDetails(obj, {
             isOkStatusCode: true,
             isPrimarySuperDomainOrigin: true,
             isHtml: true,
@@ -326,39 +204,8 @@ describe('Server', () => {
             cookies: [],
           })
 
-          const res = await this.rp('http://localhost:2000/index.html')
-
-          expect(res.statusCode).to.eq(200)
-          expect(res.headers['etag']).to.exist
-          expect(res.headers['set-cookie']).not.to.match(/initial=;/)
-          expect(res.headers['cache-control']).to.eq('no-cache, no-store, must-revalidate')
-          expect(res.body).to.include('index.html content')
-          expect(res.body).not.to.include('document.domain = \'localhost\'')
-          expect(res.body).to.include('.action("app:window:before:load",window)')
-          expect(res.body).to.include('</script>\n  </head>')
-        })
-
-        it('sends back the content type', async function () {
-          const obj = await this.server._onResolveUrl('/assets/foo.json', {}, this.automationRequest)
-
-          await expectToEqDetails(obj, {
-            isOkStatusCode: true,
-            isPrimarySuperDomainOrigin: true,
-            isHtml: false,
-            contentType: 'application/json',
-            url: 'http://localhost:2000/assets/foo.json',
-            originalUrl: '/assets/foo.json',
-            filePath: Fixtures.projectPath('no-server/dev/assets/foo.json'),
-            status: 200,
-            statusText: 'OK',
-            redirects: [],
-            cookies: [],
-          })
-        })
-
-        it('buffers the response', function () {
-          sinon.spy(this.server.request, 'sendStream')
-
+          expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
+        }).then(() => {
           return this.server._onResolveUrl('/index.html', {}, this.automationRequest)
           .then((obj = {}) => {
             expectToEqDetails(obj, {
@@ -375,130 +222,109 @@ describe('Server', () => {
               cookies: [],
             })
 
-            expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
-          }).then(() => {
-            return this.server._onResolveUrl('/index.html', {}, this.automationRequest)
-            .then((obj = {}) => {
-              expectToEqDetails(obj, {
-                isOkStatusCode: true,
-                isPrimarySuperDomainOrigin: true,
-                isHtml: true,
-                contentType: 'text/html',
-                url: 'http://localhost:2000/index.html',
-                originalUrl: '/index.html',
-                filePath: Fixtures.projectPath('no-server/dev/index.html'),
-                status: 200,
-                statusText: 'OK',
-                redirects: [],
-                cookies: [],
-              })
+            expect(this.server.request.sendStream).to.be.calledTwice
+          })
+        }).then(() => {
+          return this.rp('http://localhost:2000/index.html')
+          .then((res) => {
+            expect(res.statusCode).to.eq(200)
+            expect(res.body).to.include('Cypress')
 
-              expect(this.server.request.sendStream).to.be.calledTwice
-            })
-          }).then(() => {
-            return this.rp('http://localhost:2000/index.html')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
-              expect(res.body).not.to.include('document.domain')
-              expect(res.body).to.include('localhost')
-              expect(res.body).to.include('Cypress')
+            expect(this.buffers.buffer).to.be.undefined
+          })
+        })
+      })
 
-              expect(this.buffers.buffer).to.be.undefined
+      it('can follow static file redirects', function () {
+        return this.server._onResolveUrl('/sub', {}, this.automationRequest)
+        .then((obj = {}) => {
+          return expectToEqDetails(obj, {
+            isOkStatusCode: true,
+            isPrimarySuperDomainOrigin: true,
+            isHtml: true,
+            contentType: 'text/html',
+            url: 'http://localhost:2000/sub/',
+            originalUrl: '/sub',
+            filePath: Fixtures.projectPath('no-server/dev/sub/'),
+            status: 200,
+            statusText: 'OK',
+            redirects: ['301: http://localhost:2000/sub/'],
+            cookies: [],
+          })
+        }).then(() => {
+          return this.rp('http://localhost:2000/sub/')
+          .then((res) => {
+            expect(res.statusCode).to.eq(200)
+
+            expect(this.server.remoteStates.current()).to.deep.eq({
+              auth: undefined,
+              origin: 'http://localhost:2000',
+              strategy: 'file',
+              domainName: 'localhost',
+              fileServer: this.fileServer,
+              props: null,
             })
           })
         })
+      })
 
-        it('can follow static file redirects', function () {
-          return this.server._onResolveUrl('/sub', {}, this.automationRequest)
-          .then((obj = {}) => {
-            return expectToEqDetails(obj, {
-              isOkStatusCode: true,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/sub/',
-              originalUrl: '/sub',
-              filePath: Fixtures.projectPath('no-server/dev/sub/'),
-              status: 200,
-              statusText: 'OK',
-              redirects: ['301: http://localhost:2000/sub/'],
-              cookies: [],
-            })
-          }).then(() => {
-            return this.rp('http://localhost:2000/sub/')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
+      it('gracefully handles 404', function () {
+        return this.server._onResolveUrl('/does-not-exist', {}, this.automationRequest)
+        .then((obj = {}) => {
+          return expectToEqDetails(obj, {
+            isOkStatusCode: false,
+            isPrimarySuperDomainOrigin: true,
+            isHtml: true,
+            contentType: 'text/html',
+            url: 'http://localhost:2000/does-not-exist',
+            originalUrl: '/does-not-exist',
+            filePath: Fixtures.projectPath('no-server/dev/does-not-exist'),
+            status: 404,
+            statusText: 'Not Found',
+            redirects: [],
+            cookies: [],
+          })
+        }).then(() => {
+          return this.rp({
+            url: 'http://localhost:2000/does-not-exist',
+            headers: {
+              'Accept-Encoding': 'identity',
+            },
+          })
+          .then((res) => {
+            expect(res.statusCode).to.eq(404)
+            expect(res.body).to.include('Cypress errored trying to serve this file from your system:')
+            expect(res.body).to.include('does-not-exist')
 
-              expect(this.server.remoteStates.current()).to.deep.eq({
-                auth: undefined,
-                origin: 'http://localhost:2000',
-                strategy: 'file',
-                domainName: 'localhost',
-                fileServer: this.fileServer,
-                props: null,
-              })
-            })
+            expect(res.body).to.include('The file was not found')
           })
         })
+      })
 
-        it('gracefully handles 404', function () {
-          return this.server._onResolveUrl('/does-not-exist', {}, this.automationRequest)
-          .then((obj = {}) => {
-            return expectToEqDetails(obj, {
-              isOkStatusCode: false,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/does-not-exist',
-              originalUrl: '/does-not-exist',
-              filePath: Fixtures.projectPath('no-server/dev/does-not-exist'),
-              status: 404,
-              statusText: 'Not Found',
-              redirects: [],
-              cookies: [],
-            })
-          }).then(() => {
-            return this.rp({
-              url: 'http://localhost:2000/does-not-exist',
-              headers: {
-                'Accept-Encoding': 'identity',
-              },
-            })
-            .then((res) => {
-              expect(res.statusCode).to.eq(404)
-              expect(res.body).to.include('Cypress errored trying to serve this file from your system:')
-              expect(res.body).to.include('does-not-exist')
-
-              expect(res.body).to.include('The file was not found')
-            })
+      it('handles urls with hashes', function () {
+        return this.server._onResolveUrl('/index.html#/foo/bar', {}, this.automationRequest)
+        .then((obj = {}) => {
+          expectToEqDetails(obj, {
+            isOkStatusCode: true,
+            isPrimarySuperDomainOrigin: true,
+            isHtml: true,
+            contentType: 'text/html',
+            url: 'http://localhost:2000/index.html',
+            originalUrl: '/index.html',
+            filePath: Fixtures.projectPath('no-server/dev/index.html'),
+            status: 200,
+            statusText: 'OK',
+            redirects: [],
+            cookies: [],
           })
-        })
 
-        it('handles urls with hashes', function () {
-          return this.server._onResolveUrl('/index.html#/foo/bar', {}, this.automationRequest)
-          .then((obj = {}) => {
-            expectToEqDetails(obj, {
-              isOkStatusCode: true,
-              isPrimarySuperDomainOrigin: true,
-              isHtml: true,
-              contentType: 'text/html',
-              url: 'http://localhost:2000/index.html',
-              originalUrl: '/index.html',
-              filePath: Fixtures.projectPath('no-server/dev/index.html'),
-              status: 200,
-              statusText: 'OK',
-              redirects: [],
-              cookies: [],
-            })
+          expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
+        }).then(() => {
+          return this.rp('http://localhost:2000/index.html')
+          .then((res) => {
+            expect(res.statusCode).to.eq(200)
 
-            expect(this.buffers.buffer).to.include({ url: 'http://localhost:2000/index.html' })
-          }).then(() => {
-            return this.rp('http://localhost:2000/index.html')
-            .then((res) => {
-              expect(res.statusCode).to.eq(200)
-
-              expect(this.buffers.buffer).to.be.undefined
-            })
+            expect(this.buffers.buffer).to.be.undefined
           })
         })
       })
@@ -626,7 +452,6 @@ describe('Server', () => {
             expect(res.headers['x-foo-bar']).to.eq('true')
             expect(res.headers['cache-control']).to.eq('no-cache, no-store, must-revalidate')
             expect(res.body).to.include('content')
-            expect(res.body).to.include('document.domain = \'getbootstrap.com\'')
 
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</head>content</html>')
@@ -762,7 +587,6 @@ describe('Server', () => {
           .then((res) => {
             expect(res.statusCode).to.eq(200)
             expect(res.body).to.include('content')
-            expect(res.body).to.include('document.domain = \'go.com\'')
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</head>content</html>')
 
@@ -850,8 +674,6 @@ describe('Server', () => {
           return this.rp('http://espn.go.com/')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('go.com')
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</script></head><body>espn</body></html>')
 
@@ -1027,7 +849,6 @@ describe('Server', () => {
             expect(res.headers['x-foo-bar']).to.eq('true')
             expect(res.headers['cache-control']).to.eq('no-cache, no-store, must-revalidate')
             expect(res.body).to.include('content')
-            expect(res.body).to.include('document.domain = \'cypress.io\'')
 
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</head>content</html>')
@@ -1422,8 +1243,6 @@ describe('Server', () => {
           return this.rp('http://www.cypress.io/')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('cypress.io')
 
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</script></head><body>cypress</body></html>')
@@ -1464,9 +1283,6 @@ describe('Server', () => {
           return this.rp('http://localhost:2000/index.html')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('localhost')
-
             expect(res.body).to.include('.action("app:window:before:load",window)')
           })
         }).then(() => {
@@ -1497,8 +1313,6 @@ describe('Server', () => {
             return this.rp('http://www.cypress.io/')
             .then((res) => {
               expect(res.statusCode).to.eq(200)
-              expect(res.body).to.include('document.domain')
-              expect(res.body).to.include('cypress.io')
 
               expect(res.body).to.include('.action("app:window:before:load",window)')
               expect(res.body).to.include('</script></head><body>cypress</body></html>')
@@ -1543,9 +1357,6 @@ describe('Server', () => {
           return this.rp('https://www.foobar.com:8443/')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('foobar.com')
-
             expect(res.body).to.include('.action("app:window:before:load",window)')
             expect(res.body).to.include('</script></head><body>https server</body></html>')
           })
@@ -1585,9 +1396,6 @@ describe('Server', () => {
           return this.rp('http://localhost:2000/index.html')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('localhost')
-
             expect(res.body).to.include('.action("app:window:before:load",window)')
           })
         }).then(() => {
@@ -1618,9 +1426,6 @@ describe('Server', () => {
             return this.rp('https://www.foobar.com:8443/')
             .then((res) => {
               expect(res.statusCode).to.eq(200)
-              expect(res.body).to.include('document.domain')
-              expect(res.body).to.include('foobar.com')
-
               expect(res.body).to.include('.action("app:window:before:load",window)')
               expect(res.body).to.include('</script></head><body>https server</body></html>')
             })
@@ -1673,9 +1478,6 @@ describe('Server', () => {
           return this.rp(s3StaticHtmlUrl)
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('amazonaws.com')
-
             expect(res.body).to.include('Cypress')
           })
         }).then(() => {
@@ -1714,9 +1516,6 @@ describe('Server', () => {
           return this.rp('http://localhost:2000/index.html')
           .then((res) => {
             expect(res.statusCode).to.eq(200)
-            expect(res.body).to.include('document.domain')
-            expect(res.body).to.include('localhost')
-
             expect(res.body).to.include('.action("app:window:before:load",window)')
           })
         }).then(() => {
@@ -1754,9 +1553,6 @@ describe('Server', () => {
             return this.rp(s3StaticHtmlUrl)
             .then((res) => {
               expect(res.statusCode).to.eq(200)
-              expect(res.body).to.include('document.domain')
-              expect(res.body).to.include('amazonaws.com')
-
               expect(res.body).to.include('Cypress')
             })
           }).then(() => {

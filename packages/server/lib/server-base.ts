@@ -918,6 +918,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
                   debug('urlDoesNotMatchPolicy?', {
                     urlDoesNotMatchPolicy,
                     hasAlreadyVisited: options.hasAlreadyVisited,
+                    corsArgs: { policy: this._originPolicy, frameUrl: primaryRemoteState.origin, topUrl: newUrl || '' },
                     corsResult: !cors.urlMatchesPolicy({ policy: this._originPolicy, frameUrl: primaryRemoteState.origin, topUrl: newUrl || '' }),
                     isFromSpecBridge: options.isFromSpecBridge,
                   })
