@@ -859,8 +859,14 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
           return runPhase(() => {
             // get the cookies that would be sent with this request so they can be rehydrated
             // TODO: replace with logic based on config.injectDocumentDomain
+            const domain = newUrl ?
+              this._config.injectDocumentDomain ?
+                cors.getSuperDomain(newUrl) :
+                new URL(newUrl).hostname :
+              undefined
+
             return automationRequest('get:cookies', {
-              domain: cors.getSuperDomain(newUrl),
+              domain,
             })
             .then((cookies) => {
               const statusIs2xxOrAllowedFailure = () => {
@@ -1007,7 +1013,6 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
       debug('sending request with options %o', options)
 
       return runPhase(() => {
-        // @ts-ignore
         return request.sendStream(userAgent, automationRequest, options)
         .then((createReqStream) => {
           const stream = createReqStream()
