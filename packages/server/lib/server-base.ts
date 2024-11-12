@@ -31,7 +31,7 @@ import type { Browser } from '@packages/server/lib/browsers/types'
 import { InitializeRoutes, createCommonRoutes } from './routes'
 import type { FoundSpec, ProtocolManagerShape, TestingType } from '@packages/types'
 import type { Server as WebSocketServer } from 'ws'
-import { RemoteStates } from './remote_states'
+import { RemoteStates, RemoteState } from './remote_states'
 import { cookieJar, SerializableAutomationCookie } from './util/cookies'
 import { resourceTypeAndCredentialManager, ResourceTypeAndCredentialManager } from './util/resourceTypeAndCredentialManager'
 import fileServer from './file_server'
@@ -965,7 +965,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
         })
       }
 
-      const restorePreviousRemoteState = (previousRemoteState: Cypress.RemoteState, previousRemoteStateIsPrimary: boolean) => {
+      const restorePreviousRemoteState = (previousRemoteState: RemoteState, previousRemoteStateIsPrimary: boolean) => {
         this._remoteStates.set(previousRemoteState, {}, previousRemoteStateIsPrimary)
       }
 
