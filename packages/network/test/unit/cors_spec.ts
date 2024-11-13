@@ -1,4 +1,5 @@
-import { cors, Policy } from '../../lib'
+import { cors } from '../../lib'
+import { Policy } from '../../lib/cors'
 import { expect } from 'chai'
 import type { ParsedHostWithProtocolAndHost } from '../../lib/types'
 
