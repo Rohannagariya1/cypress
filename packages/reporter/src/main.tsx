@@ -2,17 +2,17 @@
 import { action, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import cs from 'classnames'
-import React, { Component } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 // @ts-ignore
 import EQ from 'css-element-queries/src/ElementQueries'
 
 import { RunnablesErrorModel } from './runnables/runnable-error'
 import appState, { AppState } from './lib/app-state'
-import events, { Runner, Events } from './lib/events'
-import runnablesStore, { RunnablesStore } from './runnables/runnables-store'
-import scroller, { Scroller } from './lib/scroller'
-import statsStore, { StatsStore } from './header/stats-store'
+import events, { Runner } from './lib/events'
+import runnablesStore from './runnables/runnables-store'
+import scroller from './lib/scroller'
+import statsStore from './header/stats-store'
 import shortcuts from './lib/shortcuts'
 
 import Header, { ReporterHeaderProps } from './header/header'
@@ -20,16 +20,26 @@ import Runnables from './runnables/runnables'
 import TestingPreferences from './preferences/testing-preferences'
 import type { MobxRunnerStore } from '@packages/app/src/store/mobx-runner-store'
 
+function usePrevious (value) {
+  const ref = useRef()
+
+  useEffect(() => {
+    ref.current = value
+  })
+
+  return ref.current
+}
+
 export interface BaseReporterProps {
   appState: AppState
   className?: string
-  runnablesStore: RunnablesStore
+  // runnablesStore: RunnablesStore
   runner: Runner
-  scroller: Scroller
-  statsStore: StatsStore
+  // scroller: Scroller
+  // statsStore: StatsStore
   autoScrollingEnabled?: boolean
   isSpecsListOpen?: boolean
-  events: Events
+  // events: Events
   error?: RunnablesErrorModel
   resetStatsOnSpecChange?: boolean
   renderReporterHeader?: (props: ReporterHeaderProps) => JSX.Element
@@ -38,108 +48,87 @@ export interface BaseReporterProps {
 }
 
 export interface SingleReporterProps extends BaseReporterProps{
-  runMode: 'single'
+  runMode?: 'single'
 }
 
-@observer
-class Reporter extends Component<SingleReporterProps> {
-  static defaultProps: Partial<SingleReporterProps> = {
-    runMode: 'single',
-    appState,
-    events,
-    runnablesStore,
-    scroller,
-    statsStore,
-  }
+const Reporter: React.FC<SingleReporterProps> = observer(({ runner, className, error, runMode = 'single', studioEnabled, autoScrollingEnabled, isSpecsListOpen, resetStatsOnSpecChange, renderReporterHeader = (props: ReporterHeaderProps) => <Header {...props}/>, runnerStore }) => {
+  const previousSpecRunId = usePrevious(runnerStore.specRunId)
+  const mounted = useRef<boolean>()
 
-  render () {
-    const {
-      appState,
-      className,
-      runnablesStore,
-      scroller,
-      error,
-      statsStore,
-      studioEnabled,
-      renderReporterHeader = (props: ReporterHeaderProps) => <Header {...props}/>,
-      runnerStore,
-    } = this.props
+  useEffect(() => {
+    if (!mounted.current) {
+      // do componentDidMount logic
+      mounted.current = true
 
-    return (
-      <div className={cs(className, 'reporter', {
-        'studio-active': appState.studioActive,
-      })}>
-        {renderReporterHeader({ appState, statsStore, runnablesStore })}
-        {appState?.isPreferencesMenuOpen ? (
-          <TestingPreferences appState={appState} />
-        ) : (
-          runnerStore.spec && <Runnables
-            appState={appState}
-            error={error}
-            runnablesStore={runnablesStore}
-            scroller={scroller}
-            spec={runnerStore.spec}
-            statsStore={statsStore}
-            studioEnabled={studioEnabled}
-            canSaveStudioLogs={runnerStore.canSaveStudioLogs}
-          />
-        )}
-      </div>
-    )
-  }
+      if (!runnerStore.spec) {
+        throw Error(`Expected runnerStore.spec not to be null.`)
+      }
 
-  // this hook will only trigger if we switch spec file at runtime
-  // it never happens in normal e2e but can happen in component-testing mode
-  componentDidUpdate (newProps: BaseReporterProps) {
-    if (!this.props.runnerStore.spec) {
-      throw Error(`Expected runnerStore.spec not to be null.`)
-    }
+      action('set:scrolling', () => {
+        // set the initial enablement of auto scroll configured inside the user preferences when the app is loaded
+        appState.setAutoScrollingUserPref(autoScrollingEnabled)
+      })()
 
-    this.props.runnablesStore.setRunningSpec(this.props.runnerStore.spec.relative)
-    if (
-      this.props.resetStatsOnSpecChange &&
-      this.props.runnerStore.specRunId !== newProps.runnerStore.specRunId
-    ) {
-      runInAction('reporter:stats:reset', () => {
-        this.props.statsStore.reset()
+      action('set:specs:list', () => {
+        appState.setSpecsList(isSpecsListOpen ?? false)
+      })()
+
+      events.init({
+        appState,
+        runnablesStore,
+        scroller,
+        statsStore,
       })
+
+      events.listen(runner)
+
+      shortcuts.start()
+      EQ.init()
+      runnablesStore.setRunningSpec(runnerStore.spec.relative)
+    } else {
+      // do componentDidUpdate logic
+
+      if (!runnerStore.spec) {
+        throw Error(`Expected runnerStore.spec not to be null.`)
+      }
+
+      runnablesStore.setRunningSpec(runnerStore.spec.relative)
+      if (
+        resetStatsOnSpecChange &&
+        runnerStore.specRunId !== previousSpecRunId
+      ) {
+        // @ts-expect-error
+        runInAction('reporter:stats:reset', () => {
+          statsStore.reset()
+        })
+      }
     }
-  }
 
-  componentDidMount () {
-    const { appState, runnablesStore, runner, scroller, statsStore, autoScrollingEnabled, isSpecsListOpen, runnerStore } = this.props
+    return () => shortcuts.stop()
+  }, [])
 
-    if (!runnerStore.spec) {
-      throw Error(`Expected runnerStore.spec not to be null.`)
-    }
-
-    action('set:scrolling', () => {
-      // set the initial enablement of auto scroll configured inside the user preferences when the app is loaded
-      appState.setAutoScrollingUserPref(autoScrollingEnabled)
-    })()
-
-    action('set:specs:list', () => {
-      appState.setSpecsList(isSpecsListOpen ?? false)
-    })()
-
-    this.props.events.init({
-      appState,
-      runnablesStore,
-      scroller,
-      statsStore,
-    })
-
-    this.props.events.listen(runner)
-
-    shortcuts.start()
-    EQ.init()
-    this.props.runnablesStore.setRunningSpec(runnerStore.spec.relative)
-  }
-
-  componentWillUnmount () {
-    shortcuts.stop()
-  }
-}
+  return (
+    <div className={cs(className, 'reporter', {
+      'studio-active': appState.studioActive,
+    })}>
+      {renderReporterHeader({ appState, statsStore, runnablesStore })}
+      {appState?.isPreferencesMenuOpen ? (
+        <TestingPreferences appState={appState} />
+      ) : (
+        runnerStore.spec && <Runnables
+          appState={appState}
+          error={error}
+          runnablesStore={runnablesStore}
+          scroller={scroller}
+          spec={runnerStore.spec}
+          statsStore={statsStore}
+          studioEnabled={studioEnabled}
+          canSaveStudioLogs={runnerStore.canSaveStudioLogs}
+        />
+      )}
+    </div>
+  )
+})
 
 declare global {
   interface Window {
