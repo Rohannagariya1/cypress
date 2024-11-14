@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { action } from 'mobx'
 import { observer } from 'mobx-react'
-import React, { Component, MouseEvent } from 'react'
+import React, { MouseEvent, useEffect, useRef } from 'react'
 
 import events, { Events } from '../lib/events'
 import { RunnablesError, RunnablesErrorModel } from './runnable-error'
@@ -154,46 +154,46 @@ export interface RunnablesProps {
   canSaveStudioLogs: boolean
 }
 
-@observer
-class Runnables extends Component<RunnablesProps> {
-  render () {
-    const { error, runnablesStore, spec, studioEnabled, canSaveStudioLogs } = this.props
+const Runnables: React.FC<RunnablesProps> = observer(({ appState, scroller, error, runnablesStore, spec, studioEnabled, canSaveStudioLogs }) => {
+  const mounted = useRef<boolean>()
+  const containerRef = useRef<HTMLDivElement>(null)
 
-    return (
-      <div ref='container' className='container'>
-        <RunnableHeader spec={spec} statsStore={statsStore} />
-        <RunnablesContent
-          runnablesStore={runnablesStore}
-          studioEnabled={studioEnabled}
-          canSaveStudioLogs={canSaveStudioLogs}
-          spec={spec}
-          error={error}
-        />
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true
 
-  componentDidMount () {
-    const { scroller, appState } = this.props
+      let maybeHandleScroll: UserScrollCallback | undefined = undefined
 
-    let maybeHandleScroll: UserScrollCallback | undefined = undefined
+      if (window.__CYPRESS_MODE__ === 'open') {
+        // in open mode, listen for scroll events so that users can pause the command log auto-scroll
+        // by manually scrolling the command log
+        maybeHandleScroll = action('user:scroll:detected', () => {
+          if (appState && appState.isRunning) {
+            appState.temporarilySetAutoScrolling(false)
+          }
+        })
+      }
 
-    if (window.__CYPRESS_MODE__ === 'open') {
-      // in open mode, listen for scroll events so that users can pause the command log auto-scroll
-      // by manually scrolling the command log
-      maybeHandleScroll = action('user:scroll:detected', () => {
-        if (appState && appState.isRunning) {
-          appState.temporarilySetAutoScrolling(false)
-        }
-      })
+      // we need to always call scroller.setContainer, but the callback can be undefined
+      // so we pass maybeHandleScroll. If we don't, Cypress blows up with an error like
+      // `A container must be set on the scroller with scroller.setContainer(container)`
+      scroller.setContainer(containerRef.current as Element, maybeHandleScroll)
     }
+  })
 
-    // we need to always call scroller.setContainer, but the callback can be undefined
-    // so we pass maybeHandleScroll. If we don't, Cypress blows up with an error like
-    // `A container must be set on the scroller with scroller.setContainer(container)`
-    scroller.setContainer(this.refs.container as Element, maybeHandleScroll)
-  }
-}
+  return (
+    <div ref={containerRef} className='container'>
+      <RunnableHeader spec={spec} statsStore={statsStore} />
+      <RunnablesContent
+        runnablesStore={runnablesStore}
+        studioEnabled={studioEnabled}
+        canSaveStudioLogs={canSaveStudioLogs}
+        spec={spec}
+        error={error}
+      />
+    </div>
+  )
+})
 
 export { RunnablesList }
 
