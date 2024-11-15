@@ -110,7 +110,7 @@ const onServer = function (app) {
   })
 }
 
-describe('e2e subdomain w/ cy.origin and injectDocumentDomain disabled', () => {
+describe('e2e subdomain', () => {
   systemTests.setup({
     servers: {
       port: 2292,
@@ -119,12 +119,15 @@ describe('e2e subdomain w/ cy.origin and injectDocumentDomain disabled', () => {
   })
 
   systemTests.it('passes', {
-    browser: '!webkit', // TODO(webkit): fix+unskip
-    spec: 'subdomain_origin.cy.js',
+    browser: 'chrome', // TODO(webkit): fix+unskip
+    spec: 'subdomain.cy.js',
     snapshot: true,
     config: {
       hosts: {
         '*.foobar.com': '127.0.0.1',
+      },
+      e2e: {
+        injectDocumentDomain: true,
       },
     },
   })
