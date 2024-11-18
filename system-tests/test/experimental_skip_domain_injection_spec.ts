@@ -29,13 +29,13 @@ describe('e2e experimentalSkipDomainInjection=true', () => {
     },
   })
 
-  systemTests.it('passes', {
-    browser: '!webkit', // TODO(webkit): fix+unskip (needs multidomain support)
+  systemTests.it('fails with an error message about experimentalSkipDomainInjection being removed', {
+    browser: '!webkit', // TODO(webkit): fix+unskip (needs multidomain support)f
     // keep the port the same to prevent issues with the snapshot
     port: PORT,
     spec: 'experimental_skip_domain_injection.cy.ts',
     snapshot: true,
-    expectedExitCode: 0,
+    expectedExitCode: 1,
     config: {
       retries: 0,
       experimentalSkipDomainInjection: ['*.foobar.com'],
