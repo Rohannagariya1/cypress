@@ -42,7 +42,7 @@ macWorkflowFilters: &darwin-workflow-filters
     - equal: [ develop, << pipeline.git.branch >> ]
     # use the following branch as well to ensure that v8 snapshot cache updates are fully tested
     - equal: [ 'update-v8-snapshot-cache-on-develop', << pipeline.git.branch >> ]
-    - equal: [ 'breaking/remove_react_16_17_merge_react18_harness_upstream', << pipeline.git.branch >> ]
+    - equal: [ 'chore/diagnose_build', << pipeline.git.branch >> ]
     - matches:
         pattern: /^release\/\d+\.\d+\.\d+$/
         value: << pipeline.git.branch >>
@@ -3557,44 +3557,6 @@ darwin-arm64-workflow: &darwin-arm64-workflow
         resource_class: cypress-io/m1-macstadium
         only-cache-for-root-user: true
 
-    - build:
-        name: darwin-arm64-build
-        executor: darwin-arm64
-        resource_class: cypress-io/m1-macstadium
-        requires:
-          - darwin-arm64-node-modules-install
-
-    - create-build-artifacts:
-        name: darwin-arm64-create-build-artifacts
-        context:
-          - test-runner:sign-mac-binary
-          - test-runner:upload
-          - test-runner:commit-status-checks
-          - test-runner:build-binary
-        executor: darwin-arm64
-        resource_class: cypress-io/m1-macstadium
-        requires:
-          - darwin-arm64-build
-
-    - v8-integration-tests:
-        name: darwin-arm64-v8-integration-tests
-        executor: darwin-arm64
-        resource_class: cypress-io/m1-macstadium
-        requires:
-          - darwin-arm64-build
-    - driver-integration-memory-tests:
-        name: darwin-arm64-driver-integration-memory-tests
-        executor: darwin-arm64
-        resource_class: cypress-io/m1-macstadium
-        requires:
-          - darwin-arm64-build
-    - server-unit-tests-cloud-environment:
-        name: darwin-arm64-server-unit-tests-cloud-environment
-        executor: darwin-arm64
-        resource_class: cypress-io/m1-macstadium
-        requires:
-          - darwin-arm64-build
-
 windows-workflow: &windows-workflow
   jobs:
     - node_modules_install:
@@ -3673,24 +3635,6 @@ windows-workflow: &windows-workflow
           - windows-build
 
 workflows:
-  linux-x64:
-    <<: *linux-x64-workflow
-    <<: *linux-x64-workflow-exclude-filters
-  linux-x64-contributor:
-    <<: *linux-x64-contributor-workflow
-    when:
-      matches:
-        pattern: /^pull\/[0-9]+/
-        value: << pipeline.git.branch >>
-  linux-arm64:
-    <<: *linux-arm64-workflow
-    <<: *linux-arm64-workflow-filters
-  darwin-x64:
-    <<: *darwin-x64-workflow
-    <<: *darwin-workflow-filters
   darwin-arm64:
     <<: *darwin-arm64-workflow
     <<: *darwin-workflow-filters
-  windows:
-    <<: *windows-workflow
-    <<: *windows-workflow-filters
