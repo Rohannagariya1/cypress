@@ -4,7 +4,7 @@ const cwd = require('../cwd')
 const debug = require('debug')('cypress:server:controllers')
 const { escapeFilenameInUrl } = require('../util/escape_filename')
 const { getCtx } = require('@packages/data-context')
-const { cors } = require('@packages/network')
+const { DocumentDomainInjection } = require('@packages/network')
 const { privilegedCommandsManager } = require('../privileged-commands/privileged-commands-manager')
 
 module.exports = {
@@ -26,8 +26,11 @@ module.exports = {
 
     debug('all files to send %o', _.map(allFilesToSend, 'relative'))
 
-    const superDomain = config.injectDocumentDomain ?
-      remoteStates.getPrimary().domainName :
+    const injection = new DocumentDomainInjection(config)
+    const { domainName } = remoteStates.getPrimary()
+
+    const superDomain = injection.shouldSetDomainForUrl(domainName) ?
+      injection.getHostname(domainName) :
       undefined
 
     const privilegedChannel = await privilegedCommandsManager.getPrivilegedChannel({
@@ -36,7 +39,7 @@ module.exports = {
       namespace: config.namespace,
       scripts: allFilesToSend,
       url: req.proxiedUrl,
-      documentDomainContext: config.injectDocumentDomain,
+      documentDomainContext: injection.shouldSetDomainForUrl(domainName),
     })
 
     const iframeOptions = {
@@ -53,8 +56,9 @@ module.exports = {
 
   async handleCrossOriginIframe (req, res, config) {
     const iframePath = cwd('lib', 'html', 'spec-bridge-iframe.html')
-    const superDomain = config.injectDocumentDomain ?
-      cors.getSuperDomain(req.proxiedUrl) :
+    const documentDomainInjection = new DocumentDomainInjection(config)
+    const superDomain = documentDomainInjection.shouldSetDomainForUrl(req.proxiedUrl) ?
+      documentDomainInjection.getHostname(req.proxiedUrl) :
       undefined
 
     const { origin } = new URL(req.proxiedUrl)
@@ -65,7 +69,7 @@ module.exports = {
       namespace: config.namespace,
       scripts: [],
       url: req.proxiedUrl,
-      documentDomainContext: config.injectDocumentDomain,
+      documentDomainContext: documentDomainInjection.shouldSetDomainForUrl(req.proxiedUrl),
     })
 
     const iframeOptions = {

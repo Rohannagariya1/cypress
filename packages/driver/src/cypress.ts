@@ -44,6 +44,7 @@ import { PrimaryOriginCommunicator, SpecBridgeCommunicator } from './cross-origi
 import { setupAutEventHandlers } from './cypress/aut_event_handlers'
 
 import type { CachedTestState } from '@packages/types'
+import { DocumentDomainInjection } from '@packages/network'
 import { setSpecContentSecurityPolicy } from './util/privileged_channel'
 
 import { telemetry } from '@packages/telemetry/src/browser'
@@ -187,7 +188,8 @@ class $Cypress {
   configure (config: Record<string, any> = {}) {
     const domainName = config.remote ? config.remote.domainName : undefined
 
-    if (domainName && config.testingType === 'e2e' && config.injectDocumentDomain) {
+    if (new DocumentDomainInjection(config).shouldSetDomainForUrl(domainName)) {
+      console.log('injecting document.domain for ', domainName)
       document.domain = domainName
     }
 
