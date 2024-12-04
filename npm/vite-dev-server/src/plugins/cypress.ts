@@ -1,5 +1,5 @@
 import debugFn from 'debug'
-import type { ModuleNode, PluginOption, ViteDevServer } from 'vite-5'
+import type { ModuleNode, PluginOption, ViteDevServer } from 'vite-6'
 import type { Vite } from '../getVite'
 import { parse, HTMLElement } from 'node-html-parser'
 import fs from 'fs'
@@ -42,7 +42,12 @@ export const Cypress = (
   // eslint-disable-next-line no-restricted-syntax
   let loader = fs.readFileSync(INIT_FILEPATH, 'utf8')
 
-  devServerEvents.on('dev-server:specs:changed', (specs: Spec[]) => {
+  devServerEvents.on('dev-server:specs:changed', ({ specs, options }: { specs: Spec[], options?: { neededForJustInTimeCompile: boolean }}) => {
+    if (options?.neededForJustInTimeCompile) {
+      // if an option is needed for just in time compile, no-op as this isn't supported in vite
+      return
+    }
+
     debug(`dev-server:secs:changed: ${specs.map((spec) => spec.relative)}`)
     specsPathsSet = getSpecsPathsSet(specs)
   })

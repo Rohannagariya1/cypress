@@ -239,14 +239,14 @@ export class ProjectLifecycleManager {
           const span = telemetry.startSpan({ name: 'dataContext:ct:startDevServer' })
 
           /**
-             * We need to start the dev server in the ProjectLifecycleManager when:
-             *   1. GA component testing is running so we can compile the dev server will all specs matching the specPattern
-             *   2. experimentalJustInTimeCompile is enabled. In this case, we start a dev server
-             *      with an empty specs list to initially compile the support file and related dependencies in order to hopefully
-             *      leverage the dev server cache for recompiling for when we actually have a spec to add to the dev server entry.
-             */
-          const specsToStartDevServer = finalConfig.experimentalJustInTimeCompile ? [] : this.ctx.project.specs
-          const devServerOptions = await this.ctx._apis.projectApi.getDevServer().start({ specs: specsToStartDevServer, config: finalConfig })
+           * We need to start the dev server in the ProjectLifecycleManager when:
+           *   1. GA component testing is running so we can compile the dev server will all specs matching the specPattern
+           *   2. justInTimeCompile is enabled (for webpack-dev-server). In this case, we start a dev server
+           *      with an empty specs list to initially compile the support file and related dependencies in order to hopefully
+           *      leverage the dev server cache for recompiling for when we actually have a spec to add to the dev server entry.
+           *      The empty specs are handled within the @cypress/webpack-dev-server package as this has no impact on vite.
+           */
+          const devServerOptions = await this.ctx._apis.projectApi.getDevServer().start({ specs: this.ctx.project.specs, config: finalConfig })
 
           // If we received a cypressConfig.port we want to null it out
           // because we propagated it into the devServer.port and it is
@@ -308,10 +308,25 @@ export class ProjectLifecycleManager {
   /**
    * Sets the initial `activeBrowser` depending on these criteria, in order of preference:
    *  1. The value of `--browser` passed via CLI.
-   *  2. The last browser selected in `open` mode (by name and channel) for this project.
-   *  3. The first browser found.
+   *  2. The value of `defaultBrowser` in `cypress.config`.
+   *  3. The last browser selected in `open` mode (by name and channel) for this project.
+   *  4. The first browser found.
    */
   async setInitialActiveBrowser () {
+    const configDefaultBrowser = this.loadedFullConfig?.defaultBrowser
+
+    // if we have a default browser from the config and a CLI browser wasn't passed and the active browser hasn't been set
+    // set the cliBrowser to the defaultBrowser from the config since we want the defaultBrowser to behave as if it was passed via CLI
+    if (configDefaultBrowser && !this.ctx.modeOptions.isBrowserGivenByCli && !this.ctx.coreData.activeBrowser) {
+      this.ctx.actions.browser.setCliBrowser(configDefaultBrowser)
+    }
+
+    // if we already have an activeBrowser, that means we are reloading the browser (e.g. after a config change in open mode)
+    // so we need to set the CLI browser to the activeBrowser to ensure the GUI shows the correct browser
+    if (this.ctx.coreData.activeBrowser && !process.env.CYPRESS_INTERNAL_E2E_TESTING_SELF) {
+      this.ctx.actions.browser.setCliBrowser(`${this.ctx.coreData.activeBrowser.name}:${this.ctx.coreData.activeBrowser.channel}`)
+    }
+
     if (this.ctx.coreData.cliBrowser) {
       await this.setActiveBrowserByNameOrPath(this.ctx.coreData.cliBrowser)
 

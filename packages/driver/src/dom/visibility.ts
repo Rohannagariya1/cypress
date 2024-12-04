@@ -5,11 +5,11 @@ import $elements from './elements'
 import $coordinates from './coordinates'
 import * as $transform from './transform'
 
-const { isElement, isBody, isHTML, isOption, isOptgroup, getParent, getFirstParentWithTagName, isAncestor, isChild, getAllParents, isDescendent, isUndefinedOrHTMLBodyDoc, elOrAncestorIsFixedOrSticky, isDetached, isFocusable, stringify: stringifyElement } = $elements
+const { isElement, isSelect, isBody, isHTML, isOption, isOptgroup, getParent, getFirstParentWithTagName, isAncestor, isChild, getAllParents, isDescendent, isUndefinedOrHTMLBodyDoc, elOrAncestorIsFixedOrSticky, isDetached, isFocusable, stringify: stringifyElement } = $elements
 
 const fixedOrAbsoluteRe = /(fixed|absolute)/
 
-const OVERFLOW_PROPS = ['hidden', 'scroll', 'auto']
+const OVERFLOW_PROPS = ['hidden', 'clip', 'scroll', 'auto']
 
 const isVisible = (el) => {
   return !isHidden(el, 'isVisible()')
@@ -36,7 +36,7 @@ const ensureEl = (el, methodName) => {
   }
 }
 
-const isStrictlyHidden = (el, methodName = 'isStrictlyHidden()', options = { checkOpacity: true }, recurse?) => {
+const isStrictlyHidden = (el: HTMLElement, methodName = 'isStrictlyHidden()', options = { checkOpacity: true }, recurse?) => {
   ensureEl(el, methodName)
   const $el = $jquery.wrap(el)
 
@@ -59,7 +59,7 @@ const isStrictlyHidden = (el, methodName = 'isStrictlyHidden()', options = { che
     // they may have not put the option into a select el,
     // in which case it will fall through to regular visibility logic
     if ($select && $select.length) {
-      // if the select is hidden, the options in it are visible too
+      // if the select is hidden, the options in it are hidden too
       return recurse ? recurse($select[0], methodName, options) : isStrictlyHidden($select[0], methodName, options)
     }
   }
@@ -117,7 +117,7 @@ const isHiddenByAncestors = (el, methodName = 'isHiddenByAncestors()', options =
   return elIsOutOfBoundsOfAncestorsOverflow($el)
 }
 
-const elHasNoEffectiveWidthOrHeight = ($el) => {
+const elHasNoEffectiveWidthOrHeight = ($el: JQuery) => {
   // Is the element's CSS width OR height, including any borders,
   // padding, and vertical scrollbars (if rendered) less than 0?
   //
@@ -140,10 +140,12 @@ const elHasNoEffectiveWidthOrHeight = ($el) => {
     transform = 'none'
   }
 
+  const hasTextContent = !!el.textContent?.trim().length
+
   const width = elClientWidth($el)
   const height = elClientHeight($el)
 
-  return isZeroLengthAndTransformNone(width, height, transform) ||
+  return (isZeroLengthAndTransformNone(width, height, transform) && !hasTextContent) ||
   isZeroLengthAndOverflowHidden(width, height, elHasOverflowHidden($el)) ||
   (el.getClientRects().length <= 0)
 }
@@ -153,21 +155,18 @@ const isZeroLengthAndTransformNone = (width, height, transform) => {
   // we learned that when an element has non-'none' transform style value like "translate(0, 0)",
   // it is visible even with `height: 0` or `width: 0`.
   // That's why we're checking `transform === 'none'` together with elClientWidth/Height.
-
-  return (width <= 0 && transform === 'none') ||
-  (height <= 0 && transform === 'none')
+  return (width <= 0 && transform === 'none') || (height <= 0 && transform === 'none')
 }
 
 const isZeroLengthAndOverflowHidden = (width, height, overflowHidden) => {
-  return (width <= 0 && overflowHidden) ||
-  (height <= 0 && overflowHidden)
+  return (width <= 0 && overflowHidden) || (height <= 0 && overflowHidden)
 }
 
 const elHasNoClientWidthOrHeight = ($el) => {
   return (elClientWidth($el) <= 0) || (elClientHeight($el) <= 0)
 }
 
-const elementBoundingRect = ($el) => $el[0].getBoundingClientRect()
+const elementBoundingRect = ($el: JQuery) => $el[0].getBoundingClientRect()
 
 const elClientHeight = ($el) => elementBoundingRect($el).height
 
@@ -207,11 +206,15 @@ const elHasOverflowHidden = function ($el) {
   return cssOverflow.includes('hidden')
 }
 
-const elHasPositionRelative = ($el) => {
+const elHasPositionRelative = ($el: JQuery<HTMLElement>) => {
   return $el.css('position') === 'relative'
 }
 
-const elHasPositionAbsolute = ($el) => {
+const elHasPositionStatic = ($el: JQuery<HTMLElement>) => {
+  return $el.css('position') == null || $el.css('position') === 'static'
+}
+
+const elHasPositionAbsolute = ($el: JQuery<HTMLElement>) => {
   return $el.css('position') === 'absolute'
 }
 
@@ -221,14 +224,18 @@ const elHasClippableOverflow = function ($el) {
             OVERFLOW_PROPS.includes($el.css('overflow-x'))
 }
 
-const canClipContent = function ($el, $ancestor) {
+const canClipContent = function ($el: JQuery<HTMLElement>, $ancestor: JQuery<HTMLElement>) {
   // can't clip without overflow properties
   if (!elHasClippableOverflow($ancestor)) {
     return false
   }
 
-  // fix for 29605 - display: contents
   if (elHasDisplayContents($ancestor)) {
+    return false
+  }
+
+  // can't clip if it's a select element
+  if (isSelect($ancestor[0])) {
     return false
   }
 
@@ -244,8 +251,18 @@ const canClipContent = function ($el, $ancestor) {
 
   // even if ancestors' overflow is clippable, if the element's offset parent
   // is a child of the ancestor, the ancestor will not clip the element
-  // unless the ancestor has position absolute
+  // unless the ancestor has a position that is not absolute
   if (elHasPositionAbsolute($offsetParent) && isChild($ancestor, $offsetParent)) {
+    return false
+  }
+
+  // even if ancestors' overflow is clippable,
+  // if the element is position static or relative,
+  // and the element's offset parent is positioned absolute, a descendent of the ancestor, and has no clippable overflow,
+  // then the ancestor will not clip the element
+  if ((elHasPositionStatic($el) || elHasPositionRelative($el))
+    && elHasPositionAbsolute($offsetParent) && isDescendent($ancestor, $offsetParent) && !elHasClippableOverflow($offsetParent)
+  ) {
     return false
   }
 
@@ -262,8 +279,7 @@ export const isW3CFocusable = (el) => {
   return isFocusable(wrap(el)) && isW3CRendered(el)
 }
 
-// @ts-ignore
-const elAtCenterPoint = function ($el) {
+const elAtCenterPoint = function ($el: JQuery<HTMLElement>) {
   const doc = $document.getDocumentFromElement($el.get(0))
   const elProps = $coordinates.getElementPositioning($el)
 
@@ -274,6 +290,8 @@ const elAtCenterPoint = function ($el) {
   if (el) {
     return $jquery.wrap(el)
   }
+
+  return undefined
 }
 
 const elDescendentsHavePositionFixedOrAbsolute = function ($parent, $child) {
@@ -294,7 +312,7 @@ const elHasVisibleChild = function ($el) {
   })
 }
 
-const elIsNotElementFromPoint = function ($el) {
+const elIsNotElementFromPoint = function ($el: JQuery<HTMLElement>) {
   // if we have a fixed position element that means
   // it is fixed 'relative' to the viewport which means
   // it MUST be available with elementFromPoint because
@@ -329,7 +347,6 @@ const elIsOutOfBoundsOfAncestorsOverflow = function ($el: JQuery<any>, $ancestor
     return false
   }
 
-  // fix for 29605 - display: contents
   if (elHasDisplayContents($el)) {
     return false
   }
@@ -396,8 +413,7 @@ const elIsHiddenByAncestors = function ($el, checkOpacity, $origEl = $el) {
   }
 
   if (elHasOverflowHidden($parent) && !elHasDisplayContents($parent) && elHasNoEffectiveWidthOrHeight($parent)) {
-    // if any of the elements between the parent and origEl
-    // have fixed or position absolute
+    // if any of the elements between the parent and origEl have fixed or position absolute
     return !elDescendentsHavePositionFixedOrAbsolute($parent, $origEl)
   }
 
@@ -560,7 +576,6 @@ export const getReasonIsHidden = function ($el, options = { checkOpacity: true }
     return `This element \`${node}\` is not visible because its parent \`${parentNode}\` has CSS property: \`overflow: hidden\` and an effective width and height of: \`${width} x ${height}\` pixels.`
   }
 
-  // nested else --___________--
   if (elOrAncestorIsFixedOrSticky($el)) {
     if (elIsNotElementFromPoint($el)) {
       // show the long element here
@@ -574,7 +589,7 @@ export const getReasonIsHidden = function ($el, options = { checkOpacity: true }
     }
   } else {
     if (elIsOutOfBoundsOfAncestorsOverflow($el)) {
-      return `This element \`${node}\` is not visible because its content is being clipped by one of its parent elements, which has a CSS property of overflow: \`hidden\`, \`scroll\` or \`auto\``
+      return `This element \`${node}\` is not visible because its content is being clipped by one of its parent elements, which has a CSS property of overflow: \`hidden\`, \`clip\`, \`scroll\` or \`auto\``
     }
   }
 

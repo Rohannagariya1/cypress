@@ -426,6 +426,8 @@ export default {
       }
 
       if (script) {
+        const config = options.project.getConfig()
+
         await options.project.protocolManager.setupProtocol(script, {
           runId: result.runId,
           projectId: options.projectId,
@@ -435,6 +437,7 @@ export default {
             retryWithBackoff: this.retryWithBackoff,
             requestPromise: this.rp,
           },
+          projectConfig: _.pick(config, ['devServerPublicPathRoute', 'port', 'proxyUrl', 'namespace']),
           mountVersion: runnerCapabilities.protocolMountVersion,
         })
       }
@@ -455,22 +458,20 @@ export default {
       'platform',
     ])
 
-    return retryWithBackoff((attemptIndex) => {
-      return rp.post({
-        body,
-        url: recordRoutes.instances(runId),
-        json: true,
-        encrypt: preflightResult.encrypt,
-        timeout: timeout ?? SIXTY_SECONDS,
-        headers: {
-          'x-route-version': '5',
-          'x-cypress-run-id': runId,
-          'x-cypress-request-attempt': attemptIndex,
-        },
-      })
-      .catch(RequestErrors.StatusCodeError, formatResponseBody)
-      .catch(tagError)
+    return rp.post({
+      body,
+      url: recordRoutes.instances(runId),
+      json: true,
+      encrypt: preflightResult.encrypt,
+      timeout: timeout ?? SIXTY_SECONDS,
+      headers: {
+        'x-route-version': '5',
+        'x-cypress-run-id': runId,
+        'x-cypress-request-attempt': 0,
+      },
     })
+    .catch(RequestErrors.StatusCodeError, formatResponseBody)
+    .catch(tagError)
   },
 
   postInstanceTests (options) {

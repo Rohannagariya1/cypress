@@ -76,10 +76,10 @@ const resolvedCtFrameworks = CT_FRAMEWORKS.map((x) => resolveComponentFrameworkD
 
 describe('detectFramework', () => {
   it('React App with webpack 5', async () => {
-    const projectPath = await scaffoldMigrationProject('react-app-webpack-5-unconfigured')
+    const projectPath = await scaffoldMigrationProject('react18-webpack-unconfigured')
 
     fakeDepsInNodeModules(projectPath, [
-      { dependency: 'react', version: '16.0.0' },
+      { dependency: 'react', version: '18.0.0' },
       { devDependency: 'webpack', version: '5.0.0' },
     ])
 
@@ -131,13 +131,12 @@ describe('detectFramework', () => {
     expect(actual.bundler).to.eq('vite')
   })
 
-  // keeping array style as to make it easier to support future next versions
-  ;['14.0.0'].forEach((v) => {
+  ;['14.0.0', '15.0.0'].forEach((v) => {
     it(`Next.js v${v}`, async () => {
       const projectPath = await scaffoldMigrationProject('nextjs-unconfigured')
 
       fakeDepsInNodeModules(projectPath, [
-        { dependency: 'react', version: '18.0.0' },
+        { dependency: 'react', version: v === '15.0.0' ? '19.0.0-rc.1' : '18.0.0' },
         { dependency: 'next', version: v },
       ])
 

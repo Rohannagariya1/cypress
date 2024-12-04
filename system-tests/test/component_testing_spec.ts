@@ -34,17 +34,9 @@ describe('component testing projects', function () {
     browser: 'chrome',
     expectedExitCode: 0,
   })
-
-  systemTests.it('issue-25951-next-app', {
-    project: 'issue-25951-next-app',
-    testingType: 'component',
-    spec: 'src/pages/_app.cy.tsx',
-    browser: 'chrome',
-    expectedExitCode: 0,
-  })
 })
 
-const REACT_MAJOR_VERSIONS = ['17', '18'] as const
+const REACT_MAJOR_VERSIONS = ['18', '19'] as const
 
 describe(`React major versions with Vite`, function () {
   systemTests.setup()
@@ -54,7 +46,7 @@ describe(`React major versions with Vite`, function () {
       return systemTests.exec(this, {
         project: `react${majorVersion}`,
         configFile: 'cypress-vite-default.config.ts',
-        spec: 'src/App.cy.jsx,src/Unmount.cy.jsx,src/UsingLegacyMount.cy.jsx,src/Rerendering.cy.jsx,src/mount.cy.jsx',
+        spec: 'src/App.cy.jsx,src/Unmount.cy.jsx,src/Rerendering.cy.jsx,src/mount.cy.jsx',
         testingType: 'component',
         browser: 'chrome',
         snapshot: true,
@@ -72,7 +64,7 @@ describe(`React major versions with Webpack`, function () {
       return systemTests.exec(this, {
         project: `react${majorVersion}`,
         configFile: 'cypress-webpack.config.ts',
-        spec: 'src/App.cy.jsx,src/Unmount.cy.jsx,src/UsingLegacyMount.cy.jsx,src/Rerendering.cy.jsx,src/mount.cy.jsx',
+        spec: 'src/App.cy.jsx,src/Unmount.cy.jsx,src/Rerendering.cy.jsx,src/mount.cy.jsx',
         testingType: 'component',
         browser: 'chrome',
         snapshot: true,
@@ -82,7 +74,7 @@ describe(`React major versions with Webpack`, function () {
   }
 })
 
-const ANGULAR_VERSIONS = ['17', '18']
+const ANGULAR_VERSIONS = ['17', '18', '19']
 
 describe(`Angular CLI versions`, () => {
   systemTests.setup()
@@ -97,7 +89,7 @@ describe(`Angular CLI versions`, () => {
     })
   }
 
-  systemTests.it('angular 18 custom config', {
+  systemTests.it('angular 19 custom config', {
     project: 'angular-custom-config',
     spec: 'src/app/my-component.cy.ts',
     testingType: 'component',
@@ -112,6 +104,13 @@ describe(`Angular CLI versions`, () => {
     browser: 'chrome',
     expectedExitCode: 0,
   })
+
+  systemTests.it('angular signals', {
+    project: 'angular-signals',
+    testingType: 'component',
+    browser: 'chrome',
+    expectedExitCode: 0,
+  })
 })
 
 describe('svelte component testing', () => {
@@ -119,7 +118,7 @@ describe('svelte component testing', () => {
 
   for (const bundler of ['webpack', 'vite']) {
     systemTests.it(`svelte + ${bundler}`, {
-      project: `svelte-${bundler}`,
+      project: `svelte-${bundler}-configured`,
       testingType: 'component',
       spec: '**/*.cy.js,!src/errors.cy.js',
       browser: 'chrome',
