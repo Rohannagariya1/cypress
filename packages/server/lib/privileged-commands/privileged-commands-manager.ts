@@ -87,7 +87,6 @@ class PrivilegedCommandsManager {
   }
 
   runPrivilegedCommand (config, { commandName, options, args }) {
-    console.log('running privileged command')
     // the presence of the command within the verifiedCommands array indicates
     // the command being run is verified
     const hasCommand = this.hasVerifiedCommand({ name: commandName, args })

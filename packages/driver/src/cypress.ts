@@ -44,7 +44,7 @@ import { PrimaryOriginCommunicator, SpecBridgeCommunicator } from './cross-origi
 import { setupAutEventHandlers } from './cypress/aut_event_handlers'
 
 import type { CachedTestState } from '@packages/types'
-import { DocumentDomainInjection } from '@packages/network'
+import { DocumentDomainInjection } from '@packages/network/lib/document-domain-injection'
 import { setSpecContentSecurityPolicy } from './util/privileged_channel'
 
 import { telemetry } from '@packages/telemetry/src/browser'
@@ -189,7 +189,6 @@ class $Cypress {
     const domainName = config.remote ? config.remote.domainName : undefined
 
     if (new DocumentDomainInjection(config).shouldSetDomainForUrl(domainName)) {
-      console.log('injecting document.domain for ', domainName)
       document.domain = domainName
     }
 
