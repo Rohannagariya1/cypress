@@ -21,7 +21,7 @@ const debug = Debug('cypress:network:document-domain-injection')
 
 export class DocumentDomainInjection {
   constructor (
-    private config: { injectDocumentDomain?: boolean, testingType?: 'e2e' | 'ct' },
+    private config: { injectDocumentDomain?: boolean, testingType?: 'e2e' | 'component' },
   ) {}
 
   private get policy (): Policy {
@@ -78,16 +78,13 @@ export class DocumentDomainInjection {
   }
 
   public shouldSetDomainForUrl (url: string | undefined): boolean {
-    if (!url) {
+    if (!url || this.config.testingType === 'component') {
       return false
     }
 
-    // localhost is special, and we need to always set documen domain for
+    // localhost is special, and we need to always set document domain for
     // localhost pages
-    if (url.includes('localhost')) {
-      return true
-    }
 
-    return this.config.testingType === 'e2e' && this.config.injectDocumentDomain
+    return !!(this.config.injectDocumentDomain) || url.includes('localhost')
   }
 }

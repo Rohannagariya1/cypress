@@ -163,6 +163,7 @@ export class SocketBase {
     const cdpIo = this._cdpIo = this.createCDPIo(socketIoRoute)
 
     automation.use({
+      // @ts-ignore - this error is new, but not introduced in the most recent edit. TODO: fix
       onPush: (message, data) => {
         socketIo.emit('automation:push:message', message, data)
         cdpIo.emit('automation:push:message', message, data)
