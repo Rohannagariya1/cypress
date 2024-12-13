@@ -106,18 +106,20 @@ const getInvocationDetails = (specWindow, config) => {
   if (specWindow.Error) {
     let stack = (new specWindow.Error()).stack
 
+    console.log('getInvocationDetails stack', stack)
     // note: specWindow.Cypress can be undefined or null
     // if the user quickly reloads the tests multiple times
 
-    // firefox and chromium include stackframes from cypress_runner.js.
+    // firefox throws a different stack than chromium
+    // which includes stackframes from cypress_runner.js.
     // So we drop the lines until we get to the spec stackframe (includes __cypress/tests)
     if (specWindow.Cypress) {
-      stack = stackWithLinesDroppedFromMarker(stack, '__cypress/tests', true)
+      stack = stackWithLinesDroppedFromMarker(stack, '/__cypress', !specWindow.Cypress.isBrowser('webkit'))
     }
 
-    const details: InvocationDetails = getSourceDetailsForFirstLine(stack, config('projectRoot')) || {}
+    const details: InvocationDetails = getSourceDetailsForFirstLine(stack, config('projectRoot')) || {};
 
-    ;(details as any).stack = stack
+    (details as any).stack = stack
 
     return details as (InvocationDetails & { stack: any })
   }
@@ -203,19 +205,14 @@ const getCodeFrameStackLine = (err, stackIndex) => {
 }
 
 const getCodeFrame = (err, stackIndex) => {
-  // console.log('getCodeFrame', {
-  //   stackIndex,
-  // })
-
   if (err.codeFrame) return err.codeFrame
 
   const stackLine = getCodeFrameStackLine(err, stackIndex)
 
+  console.log('getCodeFrame', { stack: err.stack, stackIndex, stackLine })
   if (!stackLine) return
 
   const { fileUrl, originalFile } = stackLine
-
-  // console.log('getting code frame from source', JSON.stringify({ fileUrl, originalFile, stackLine }, null, 2))
 
   return getCodeFrameFromSource($sourceMapUtils.getSourceContents(fileUrl, originalFile), stackLine)
 }
@@ -407,9 +404,8 @@ const reconstructStack = (parsedStack) => {
 const getSourceStack = (stack, projectRoot?) => {
   if (!_.isString(stack)) return {}
 
-  const withDroppedInternal = stackWithLinesDroppedFromMarker(stack, '__cypress/tests', true)
   const getSourceDetailsWithStackUtil = _.partial(getSourceDetailsForLine, projectRoot)
-  const parsed = _.map(withDroppedInternal.split('\n'), getSourceDetailsWithStackUtil)
+  const parsed = _.map(stack.split('\n'), getSourceDetailsWithStackUtil)
 
   return {
     parsed,

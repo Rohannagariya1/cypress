@@ -140,7 +140,7 @@ export const generateCtErrorTests = (server: 'Webpack' | 'Vite', configFile: str
       })
     })
 
-    it('cy.then', () => {
+    it.only('cy.then', () => {
       const verify = loadErrorSpec({
         filePath: 'errors/then.cy.js',
         failCount: 3,

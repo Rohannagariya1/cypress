@@ -16,9 +16,9 @@ const crossOriginScriptRe = /^script error/i
 
 if (!Error.captureStackTrace) {
   Error.captureStackTrace = (err, fn) => {
-    const stack = (new Error()).stack;
+    const stack = (new Error()).stack
 
-    (err as Error).stack = $stackUtils.stackWithLinesDroppedFromMarker(stack, fn?.name)
+    ;(err as Error).stack = $stackUtils.stackWithLinesDroppedFromMarker(stack, fn?.name, false)
   }
 }
 
@@ -136,7 +136,7 @@ const getUserInvocationStack = (err, state) => {
   // command errors and command assertion errors (default assertion or cy.should)
   // have the invocation stack attached to the current command
   // prefer err.userInvocation stack if it's been set
-  let userInvocationStack = getUserInvocationStackFromError(err) || state('currentAssertionUserInvocationStack')
+  let userInvocationStack = err.userInvocationStack || state('currentAssertionUserInvocationStack')
 
   // if there is no user invocation stack from an assertion or it is the default
   // assertion, meaning it came from a command (e.g. cy.get), prefer the
@@ -316,10 +316,6 @@ export class CypressError extends Error {
   }
 }
 
-const getUserInvocationStackFromError = (err) => {
-  return err.userInvocationStack
-}
-
 const internalErr = (err): InternalCypressError => {
   const newErr = new InternalCypressError(err.message)
 
@@ -427,11 +423,16 @@ const createUncaughtException = ({ frameType, handlerType, state, err }) => {
 // but the stack points to cypress internals. here we replace the internal
 // cypress stack with the invocation stack, which points to the user's code
 const stackAndCodeFrameIndex = (err, userInvocationStack): StackAndCodeFrameIndex => {
+  //console.log('stackAndCodeFrameIndex', { isCypressErr: isCypressErr(err), isChai: isChaiValidationErr(err) })
   if (!userInvocationStack) return { stack: err.stack }
 
   if (isCypressErr(err) || isChaiValidationErr(err)) {
+    //console.log('splicing userInvocationStack')
+
     return $stackUtils.stackWithUserInvocationStackSpliced(err, userInvocationStack)
   }
+
+  //console.log('returning new stack from userInvocationStack')
 
   return { stack: $stackUtils.replacedStack(err, userInvocationStack) || '' }
 }
@@ -450,8 +451,27 @@ const enhanceStack = ({ err, userInvocationStack, projectRoot }: {
   userInvocationStack?: any
   projectRoot?: any
 }) => {
-  const { stack, index } = preferredStackAndCodeFrameIndex(err, userInvocationStack)
+  let invocationStack = userInvocationStack
+
+  if (err.codeFrame === undefined) {
+    //console.log('enhanceStack - no codeframe, so dropping lines til marker')
+    err.stack = $stackUtils.stackWithLinesDroppedFromMarker(err.stack, '/__cypress', true)
+    // sometimes the userInvocationStack has internals, so drop them
+    invocationStack = userInvocationStack ? $stackUtils.stackWithLinesDroppedFromMarker(userInvocationStack, '/__cypress', true) : undefined
+    // sometimes the userInvocationStack includes the replacement marker, so drop everything after that
+    //invocationStack = invocationStack ? $stackUtils.stackPriorToReplacementMarker(invocationStack) : undefined
+  }
+
+  const { stack, index } = preferredStackAndCodeFrameIndex(err, invocationStack)
+
+  //console.log('enhanceStack stack', stack)
   const { sourceMapped, parsed } = $stackUtils.getSourceStack(stack, projectRoot)
+
+  // console.log('enhanceStack err', err)
+  // console.log('enhanceStack userInvocationStack', userInvocationStack)
+  // console.log('enhanceStack projectRoot', projectRoot)
+  // console.log('enhanceStack parsed', parsed)
+  // console.log('enhanceStack sourceMapped', sourceMapped)
 
   err.stack = sourceMapped
   err.parsedStack = parsed
@@ -637,7 +657,6 @@ export default {
   errorFromUncaughtEvent,
   getUnsupportedPlugin,
   getUserInvocationStack,
-  getUserInvocationStackFromError,
   isAssertionErr,
   isChaiValidationErr,
   isCypressErr,
