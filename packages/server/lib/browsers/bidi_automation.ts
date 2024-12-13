@@ -1,13 +1,12 @@
 import debugModule from 'debug'
 import type { Automation } from '../automation'
-import type { BrowserPreRequest, BrowserResponseReceived } from '@packages/proxy'
+import type { BrowserPreRequest, BrowserResponseReceived, ResourceType } from '@packages/proxy'
 import type { Client as WebDriverClient } from 'webdriver'
 import type {
   NetworkBeforeRequestSentParameters,
   NetworkResponseStartedParameters,
   NetworkResponseCompletedParameters,
   NetworkFetchErrorParameters,
-  NetworkInitiator,
   ScriptRealmDestroyedParameters,
   ScriptRealmInfo,
   BrowsingContextInfo,
@@ -15,8 +14,25 @@ import type {
 
 const debugVerbose = debugModule('cypress-verbose:server:browsers:bidi_automation')
 
-const normalizeResourceType = (type: NetworkInitiator['type']) => {
-  return type === 'parser' ? 'other' : type
+type RequestInitiatorType = 'iframe' | 'script' | 'link' | 'img' | 'xmlhttprequest' | 'fetch' | null
+type RequestDestination = 'script' | 'style' | 'image' | 'iframe' | ''
+
+// maps the network initiator to a ResourceType (which is initially based on CDP)
+const normalizeResourceType = (type: RequestInitiatorType): ResourceType => {
+  switch (type) {
+    case 'xmlhttprequest':
+      return 'xhr'
+    case 'img':
+      return 'image'
+    case 'iframe':
+      return 'document'
+    // everything else we can't definitively say, as we could have a link that might be a stylesheet or script, but it could also be a generic link as well
+    case 'link':
+    case null:
+      return 'other'
+    default:
+      return type
+  }
 }
 
 export class BidiAutomation {
@@ -44,6 +60,9 @@ export class BidiAutomation {
     this.webDriverClient = webDriverClient
 
     // bind Bidi Events to update the standard automation client
+
+    // Error here is expected until webdriver adds initiatorType and destination to the request object
+    // @ts-expect-error
     this.webDriverClient.on('network.beforeRequestSent', this.onBeforeRequestSent.bind(this))
     this.webDriverClient.on('network.responseStarted', this.onResponseStarted.bind(this))
     this.webDriverClient.on('network.responseCompleted', this.onResponseComplete.bind(this))
@@ -116,7 +135,12 @@ export class BidiAutomation {
   }
 
   // CDP equivalent: Network.requestWillBeSent
-  private async onBeforeRequestSent (params: NetworkBeforeRequestSentParameters) {
+  private async onBeforeRequestSent (params: NetworkBeforeRequestSentParameters & {
+    request: {
+      destination: RequestDestination
+      initiatorType: RequestInitiatorType
+    }
+  }) {
     debugVerbose('received network.beforeRequestSend %o', params)
 
     let url = params.request.url
@@ -137,13 +161,15 @@ export class BidiAutomation {
       parsedHeaders[header.name] = header.value.value
     })
 
+    const resourceType = normalizeResourceType(params.request.initiatorType)
+
     const browserPreRequest: BrowserPreRequest = {
       requestId: params.request.request,
       method: params.request.method,
       url,
       headers: parsedHeaders,
-      resourceType: normalizeResourceType(params.initiator.type),
-      originalResourceType: params.initiator.type,
+      resourceType,
+      originalResourceType: params.request.destination || params.initiator.type,
       initiator: params.initiator,
     }
 
@@ -155,7 +181,7 @@ export class BidiAutomation {
     // so the request-middleware can identify the request
 
     if (params.isBlocked) {
-      if (params.context === this.AUTContextId) {
+      if (params.context === this.AUTContextId && resourceType === 'document') {
         debugVerbose(`AUT request detected, adding X-Cypress-Is-AUT-Frame for request ID: ${params.request.request}`)
 
         params.request.headers.push({
