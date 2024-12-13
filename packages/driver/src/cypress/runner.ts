@@ -932,7 +932,6 @@ const hookFailed = (hook, err, getTest, getTestFromHookOrFindTest) => {
 }
 
 const setHookFailureProps = (test, hook, err) => {
-  console.log('setHookFailureProps', err)
   err = $errUtils.wrapErr(err)
   const hookName = getHookName(hook)
 
