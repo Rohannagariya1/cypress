@@ -175,7 +175,7 @@ export class ServerBase<TSocket extends SocketE2E | SocketCt> {
     this._baseUrl = null
     this._fileServer = null
 
-    this._documentDomainInjection = new DocumentDomainInjection(config)
+    this._documentDomainInjection = DocumentDomainInjection.InjectionBehavior(config)
     // TODO: maybe dont need to keep this around anymore
     this._config = config
 

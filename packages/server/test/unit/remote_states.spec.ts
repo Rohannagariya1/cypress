@@ -4,7 +4,7 @@ import chaiAsPromised from 'chai-as-promised'
 import chaiSubset from 'chai-subset'
 import sinonChai from '@cypress/sinon-chai'
 import Sinon from 'sinon'
-import { DocumentDomainInjection } from '@packages/network'
+import { OriginBehavior } from '@packages/network/lib/document-domain-injection'
 
 import { RemoteStates, DEFAULT_DOMAIN_NAME } from '../../lib/remote_states'
 
@@ -23,10 +23,10 @@ describe('remote states', () => {
   }
 
   let remoteStates: RemoteStates
-  let documentDomainInjection: Sinon.SinonStubbedInstance<DocumentDomainInjection>
+  let documentDomainInjection: Sinon.SinonStubbedInstance<OriginBehavior>
 
   beforeEach(() => {
-    documentDomainInjection = Sinon.createStubInstance(DocumentDomainInjection)
+    documentDomainInjection = Sinon.createStubInstance(OriginBehavior)
 
     // While the behavior of this class is partially determined by DocumentDomainInjection,
     // it's not necessary to test multiple permutations of its getOriginKey - as long as it's

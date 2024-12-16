@@ -188,7 +188,7 @@ class $Cypress {
   configure (config: Record<string, any> = {}) {
     const domainName = config.remote ? config.remote.domainName : undefined
 
-    if (new DocumentDomainInjection(config).shouldSetDomainForUrl(domainName)) {
+    if (DocumentDomainInjection.InjectionBehavior(config).shouldInjectDocumentDomain(domainName)) {
       document.domain = domainName
     }
 

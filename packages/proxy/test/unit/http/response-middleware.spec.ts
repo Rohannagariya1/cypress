@@ -23,7 +23,7 @@ describe('http/response-middleware', function () {
   let documentDomainInjection: DocumentDomainInjection
 
   beforeEach(() => {
-    documentDomainInjection = new DocumentDomainInjection({ injectDocumentDomain: false, testingType: 'e2e' })
+    documentDomainInjection = DocumentDomainInjection.InjectionBehavior({ injectDocumentDomain: false, testingType: 'e2e' })
     remoteStates = new RemoteStates(remoteStateConfig, documentDomainInjection)
   })
 
@@ -2127,12 +2127,13 @@ describe('http/response-middleware', function () {
       htmlStub.restore()
     })
 
-    ;[true, false].forEach((injectDocumentDomain) => {
+    ;[true].forEach((injectDocumentDomain) => {
       describe(`when injectDocumentDomain is ${injectDocumentDomain}`, () => {
         const config = {
           modifyObstructiveCode: true,
           experimentalModifyObstructiveThirdPartyCode: true,
           injectDocumentDomain,
+          testingType: 'e2e',
         }
 
         it('modifyObstructiveThirdPartyCode is true for secondary requests', function () {

@@ -22,7 +22,7 @@ describe('http/request-middleware', () => {
   let documentDomainInjection
 
   beforeEach(() => {
-    documentDomainInjection = new DocumentDomainInjection({ injectDocumentDomain: false, testingType: 'e2e' })
+    documentDomainInjection = DocumentDomainInjection.InjectionBehavior({ injectDocumentDomain: false, testingType: 'e2e' })
     remoteStates = new RemoteStates(remoteStateConfig, documentDomainInjection)
   })
 

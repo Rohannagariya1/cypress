@@ -10,84 +10,78 @@ of this logic, which should help inform a subsequent refactor strategy.
   - whether to inject document.domain in proxied files (proxy/lib/http/response-middleware)
   - how to verify stack traces of privileged commands in chrome
 */
-
-//TODO: determine what to do about /cors
 import Debug from 'debug'
 import { isString, isEqual } from 'lodash'
-import { getSuperDomainOrigin, getSuperDomain, parseUrlIntoHostProtocolDomainTldPort, Policy } from './cors'
+import { getSuperDomainOrigin, getSuperDomain, parseUrlIntoHostProtocolDomainTldPort } from './cors'
 import type { ParsedHostWithProtocolAndHost } from './types'
 
 const debug = Debug('cypress:network:document-domain-injection')
 
-export class DocumentDomainInjection {
-  constructor (
-    private config: { injectDocumentDomain?: boolean, testingType?: 'e2e' | 'component' },
-  ) {}
-
-  private get policy (): Policy {
-    return this.config.injectDocumentDomain ? 'same-super-domain-origin' : 'same-origin'
-  }
-
-  // primarily used by `packages/server/lib/remote_states` to determine ??
+export class DocumentDomainBehavior implements DocumentDomainInjection {
   public getOrigin (url: string) {
-    if (this.config.injectDocumentDomain) {
-      return getSuperDomainOrigin(url)
-    }
-
-    return new URL(url).origin
+    return getSuperDomainOrigin(url)
   }
-
-  public getHostname (url: string) {
-    if (this.config.injectDocumentDomain) {
-      debug('Hostname returning superdomain. Config %s url %s', this.config.injectDocumentDomain, url)
-      debug('superdomain:', getSuperDomain(url))
-
-      return getSuperDomain(url)
-    }
-
-    debug('hostname returning URL hostname')
-
-    return new URL(url).hostname
+  public getHostname (url: string): string {
+    return getSuperDomain(url)
   }
-
   public urlsMatch (frameUrl: string | ParsedHostWithProtocolAndHost, topUrl: string | ParsedHostWithProtocolAndHost): boolean {
     const frameProps = isString(frameUrl) ? parseUrlIntoHostProtocolDomainTldPort(frameUrl) : frameUrl
     const topProps = isString(topUrl) ? parseUrlIntoHostProtocolDomainTldPort(topUrl) : topUrl
 
-    debug('urlsMatch %s policy %o', this.policy, { frameUrl, topUrl })
-    switch (this.policy) {
-      case 'same-origin':
-        debug('match? ', isEqual(frameProps, topProps))
+    const { subdomain: frameSubdomain, ...parsedFrameUrl } = frameProps
+    const { subdomain: topSubdomain, ...parsedTopUrl } = topProps
 
-        return isEqual(frameProps, topProps)
-      case 'same-super-domain-origin':
-      case 'schemeful-same-site': {
-        const { port: framePort, subdomain: frameSubdomain, ...parsedFrameUrl } = frameProps
-        const { port: topPort, subdomain: topSubdomain, ...parsedTopUrl } = topProps
+    return isEqual(parsedFrameUrl, parsedTopUrl)
+  }
+  public shouldInjectDocumentDomain (url: string | undefined) {
+    debug('document-domain behavior: should inject document domain -> true')
 
-        const doPortsPassSameSchemeCheck = this.policy === 'same-super-domain-origin' ?
-          framePort === topPort : // ports have to match precisely with same-super-domain-origin
-          (framePort === topPort) || (framePort !== '443' && topPort !== '443') // schemeful-same-site needs them to match, unless neither are https
+    return !!url
+  }
+}
 
-        debug('match? ', doPortsPassSameSchemeCheck, isEqual(parsedFrameUrl, parsedTopUrl))
+export class OriginBehavior implements DocumentDomainInjection {
+  public getOrigin (url: string) {
+    return new URL(url).origin
+  }
+  public getHostname (url: string): string {
+    return new URL(url).hostname
+  }
+  public urlsMatch (frameUrl: string | ParsedHostWithProtocolAndHost, topUrl: string | ParsedHostWithProtocolAndHost): boolean {
+    const frameProps = isString(frameUrl) ? parseUrlIntoHostProtocolDomainTldPort(frameUrl) : frameUrl
+    const topProps = isString(topUrl) ? parseUrlIntoHostProtocolDomainTldPort(topUrl) : topUrl
 
-        return doPortsPassSameSchemeCheck && isEqual(parsedFrameUrl, parsedTopUrl)
-      }
-      default:
-        return false
+    return isEqual(frameProps, topProps)
+  }
+  public shouldInjectDocumentDomain (url: string | undefined) {
+    debug('origin-behavior: should inject document domain -> false')
+
+    return false
+  }
+}
+
+export abstract class DocumentDomainInjection {
+  public static InjectionBehavior (config: { injectDocumentDomain?: boolean, testingType?: 'e2e' | 'component'}): DocumentDomainInjection {
+    debug('Determining injection behavior for config values: %o', {
+      injectDocumentDomain: config.injectDocumentDomain,
+      testingType: config.testingType,
+    })
+
+    debug('called from', new Error().stack)
+
+    if (config.injectDocumentDomain && config.testingType === 'e2e') {
+      debug('Returning document domain injection behavior')
+
+      return new DocumentDomainBehavior()
     }
+
+    debug('Returning origin behavior - no document domain injection')
+
+    return new OriginBehavior()
   }
 
-  public shouldSetDomainForUrl (url: string | undefined): boolean {
-    if (!url || this.config.testingType === 'component') {
-      return false
-    }
-
-    // localhost is special, and we need to always set document domain for
-    // localhost pages
-
-    debug('should set domain for url %s? config: %s, result:', url, this.config.injectDocumentDomain, !!(this.config.injectDocumentDomain))
-
-    return !!(this.config.injectDocumentDomain)
-  }
+  public abstract getOrigin (url: string): string
+  public abstract getHostname (url: string): string
+  public abstract urlsMatch (frameUrl: string | ParsedHostWithProtocolAndHost, topUrl: string | ParsedHostWithProtocolAndHost): boolean
+  public abstract shouldInjectDocumentDomain (url: string | undefined): boolean
 }

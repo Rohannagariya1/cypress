@@ -425,7 +425,7 @@ const SetInjectionLevel: ResponseMiddleware = function () {
   const isReqMatchSuperDomainOrigin = reqMatchesPolicyBasedOnDomain(
     this.req,
     this.remoteStates.current(),
-    new DocumentDomainInjection(this.config),
+    DocumentDomainInjection.InjectionBehavior(this.config),
   )
 
   span?.setAttributes({
@@ -442,7 +442,7 @@ const SetInjectionLevel: ResponseMiddleware = function () {
       return 'partial'
     }
 
-    const documentDomainInjection = new DocumentDomainInjection(this.config)
+    const documentDomainInjection = DocumentDomainInjection.InjectionBehavior(this.config)
 
     // NOTE: Only inject fullCrossOrigin if the super domain origins do not match in order to keep parity with cypress application reloads
     const urlDoesNotMatchPolicyBasedOnDomain = !reqMatchesPolicyBasedOnDomain(
@@ -844,7 +844,7 @@ const MaybeInjectHtml: ResponseMiddleware = function () {
       isNotJavascript: !resContentTypeIsJavaScript(this.incomingRes),
       useAstSourceRewriting: this.config.experimentalSourceRewriting,
       modifyObstructiveThirdPartyCode: this.config.experimentalModifyObstructiveThirdPartyCode && !this.remoteStates.isPrimarySuperDomainOrigin(this.req.proxiedUrl),
-      shouldInjectDocumentDomain: new DocumentDomainInjection(this.config).shouldSetDomainForUrl(this.req.proxiedUrl),
+      shouldInjectDocumentDomain: DocumentDomainInjection.InjectionBehavior(this.config).shouldInjectDocumentDomain(this.req.proxiedUrl),
       modifyObstructiveCode: this.config.modifyObstructiveCode,
       url: this.req.proxiedUrl,
       deferSourceMapRewrite: this.deferSourceMapRewrite,

@@ -85,7 +85,7 @@ export class Validator {
       })
     }
 
-    const injector = new DocumentDomainInjection(Cypress.config())
+    const injector = DocumentDomainInjection.InjectionBehavior(Cypress.config())
 
     const policy = cors.policyFromConfig({ injectDocumentDomain: Cypress.config('injectDocumentDomain') })
 

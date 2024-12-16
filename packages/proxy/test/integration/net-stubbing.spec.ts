@@ -25,7 +25,7 @@ context('network stubbing', () => {
   let server
   let destinationPort
   let socket
-  let documentDomainInjection
+  let documentDomainInjection: DocumentDomainInjection
 
   const serverPort = 3030
   const fileServerPort = 3030
@@ -43,7 +43,7 @@ context('network stubbing', () => {
       experimentalCspAllowList: false,
     }
 
-    documentDomainInjection = new DocumentDomainInjection({ injectDocumentDomain: false, testingType: 'e2e' })
+    documentDomainInjection = DocumentDomainInjection.InjectionBehavior({ injectDocumentDomain: false, testingType: 'e2e' })
 
     remoteStates = createRemoteStates()
     socket = new EventEmitter()

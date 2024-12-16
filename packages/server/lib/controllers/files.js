@@ -4,7 +4,7 @@ const cwd = require('../cwd')
 const debug = require('debug')('cypress:server:controllers')
 const { escapeFilenameInUrl } = require('../util/escape_filename')
 const { getCtx } = require('@packages/data-context')
-const { DocumentDomainInjection } = require('@packages/network')
+const { DocumentDomainInjection } = require('@packages/network/lib/document-domain-injection')
 const { privilegedCommandsManager } = require('../privileged-commands/privileged-commands-manager')
 
 module.exports = {
@@ -26,7 +26,7 @@ module.exports = {
 
     debug('all files to send %o', _.map(allFilesToSend, 'relative'))
 
-    const injection = new DocumentDomainInjection(config)
+    const injection = DocumentDomainInjection.InjectionBehavior(config)
 
     debug('primary remote state', remoteStates.getPrimary())
     const { origin } = remoteStates.getPrimary()
@@ -56,8 +56,8 @@ module.exports = {
 
   async handleCrossOriginIframe (req, res, config) {
     const iframePath = cwd('lib', 'html', 'spec-bridge-iframe.html')
-    const documentDomainInjection = new DocumentDomainInjection(config)
-    const superDomain = documentDomainInjection.shouldSetDomainForUrl(req.proxiedUrl) ?
+    const documentDomainInjection = DocumentDomainInjection.InjectionBehavior(config)
+    const superDomain = documentDomainInjection.shouldInjectDocumentDomain(req.proxiedUrl) ?
       documentDomainInjection.getHostname(req.proxiedUrl) :
       undefined
 
@@ -69,7 +69,7 @@ module.exports = {
       namespace: config.namespace,
       scripts: [],
       url: req.proxiedUrl,
-      documentDomainContext: documentDomainInjection.shouldSetDomainForUrl(req.proxiedUrl),
+      documentDomainContext: documentDomainInjection.shouldInjectDocumentDomain(req.proxiedUrl),
     })
 
     const iframeOptions = {
