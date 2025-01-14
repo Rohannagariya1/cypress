@@ -2,7 +2,6 @@ import js from '@eslint/js'
 import ts, { InfiniteDepthConfigWithExtends } from 'typescript-eslint'
 import cy from 'eslint-plugin-cypress/flat'
 import mocha from 'eslint-plugin-mocha'
-import type { Linter } from 'eslint'
 import globals from 'globals'
 import path from 'path'
 
