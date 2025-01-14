@@ -6,6 +6,7 @@ const { parseGrep, shouldTestRun } = require('./utils')
 const { version } = require('../package.json')
 const debug = require('debug')('@cypress/grep')
 
+// eslint-disable-next-line no-console
 debug.log = console.info.bind(console)
 
 // preserve the real "it" function

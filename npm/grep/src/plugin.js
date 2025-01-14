@@ -1,3 +1,4 @@
+/* eslint no-console: 0 */
 const debug = require('debug')('@cypress/grep')
 const globby = require('globby')
 const { getTestNames } = require('find-test-names')

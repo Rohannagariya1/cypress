@@ -88,7 +88,7 @@ function parseTagsGrep (s) {
     })
 
     if (ORS_filtered.length === 0) {
-      ORS_filtered[ 0 ] = explicitNotTags
+      ORS_filtered[0] = explicitNotTags
     }
   }
 
@@ -132,7 +132,9 @@ function shouldTestRunTitle (parsedGrep, testName) {
   }
 
   if (!Array.isArray(parsedGrep)) {
+    // eslint-disable-next-line no-console
     console.error('Invalid parsed title grep')
+    // eslint-disable-next-line no-console
     console.error(parsedGrep)
     throw new Error('Expected title grep to be an array')
   }
