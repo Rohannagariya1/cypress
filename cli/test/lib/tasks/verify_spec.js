@@ -31,8 +31,6 @@ const DEFAULT_VERIFY_TIMEOUT = 30000
 let stdout
 let spawnedProcess
 
-/* eslint-disable no-octal */
-
 context('lib/tasks/verify', () => {
   require('mocha-banner').register()
 

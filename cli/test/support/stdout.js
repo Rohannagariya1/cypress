@@ -9,7 +9,6 @@ module.exports = {
     process.stdout.write = function (str) {
       logs.push(str)
 
-      /* eslint-disable prefer-rest-params */
       write.apply(this, arguments)
     }
 

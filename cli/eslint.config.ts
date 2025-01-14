@@ -20,7 +20,7 @@
 }
 */
 import path from 'path'
-import { baseConfig } from "../eslint.config"
+import { baseConfig } from '../eslint.config'
 import globals from 'globals'
 
 export default [
@@ -33,9 +33,9 @@ export default [
         tsconfigRootDir: path.join(__dirname, '../packages/ts/tsconfig.json'),
       },
       globals: {
-        ...globals.node
-      }
-    }
+        ...globals.node,
+      },
+    },
   },
   {
     ignores: [
@@ -48,7 +48,7 @@ export default [
       'svelte/**/*',
       'vue/**/*',
       'types/**/*',
-    ]
+    ],
   },
   {
     files: ['test/**/*.{ts,js}'],
@@ -56,7 +56,7 @@ export default [
       globals: {
         sinon: 'readonly',
         lib: 'readonly',
-      }
-    }
-  }
+      },
+    },
+  },
 ]

@@ -186,6 +186,7 @@ describe('lib/tasks/download', function () {
   context('verify downloaded file', function () {
     before(function () {
       this.expectedChecksum = hasha.fromFileSync(examplePath)
+      // eslint-disable-next-line no-restricted-syntax
       this.expectedFileSize = fs.statSync(examplePath).size
       this.onProgress = sinon.stub().returns(undefined)
       debug('example file %s should have checksum %s and file size %d',

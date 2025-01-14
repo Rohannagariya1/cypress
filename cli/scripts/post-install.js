@@ -19,12 +19,12 @@ shell.set('-e') // any error is fatal
 // This ensures that globals like Cypress.$, Cypress._ etc are property typed
 // yet we do not install "@types/.." packages with "npm install cypress"
 // because they can conflict with user's own libraries
-
+// eslint-disable-next-line no-restricted-syntax
 fs.ensureDirSync(join(__dirname, '..', 'types'))
 
 includeTypes.forEach((folder) => {
   const source = resolvePkg(`@types/${folder}`, { cwd: __dirname })
-
+  // eslint-disable-next-line no-restricted-syntax
   fs.copySync(source, join(__dirname, '..', 'types', folder))
 })
 
@@ -75,6 +75,7 @@ shell.sed('-i', 'from \'sinon\';', 'from \'../sinon\';', sinonChaiFilename)
 
 // copy experimental network stubbing type definitions
 // so users can import: `import 'cypress/types/net-stubbing'`
+// eslint-disable-next-line no-restricted-syntax
 fs.copySync(resolvePkg('@packages/net-stubbing/lib/external-types.ts'), 'types/net-stubbing.d.ts')
 
 // https://github.com/cypress-io/cypress/issues/18069
@@ -90,11 +91,12 @@ const filesToUncomment = [
 
 filesToUncomment.forEach((file) => {
   const filePath = join(__dirname, '../types', file)
+  // eslint-disable-next-line no-restricted-syntax
   const str = fs.readFileSync(filePath).toString()
 
   const result = str.split('\n').map((line) => {
     return line.startsWith('//z ') ? line.substring(4) : line
   }).join('\n')
-
+  // eslint-disable-next-line no-restricted-syntax
   fs.writeFileSync(filePath, result)
 })
