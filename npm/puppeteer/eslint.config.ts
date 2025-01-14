@@ -3,13 +3,13 @@ import globals from 'globals'
 export default [
   ...baseConfig,
   {
-    ignores: ['**/dist']
+    ignores: ['**/dist'],
   },
   {
     languageOptions: {
       globals: {
-        require: 'readonly'
-      }
-    }
-  }
+        require: 'readonly',
+      },
+    },
+  },
 ]
