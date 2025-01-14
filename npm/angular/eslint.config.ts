@@ -5,7 +5,7 @@ import globals from 'globals'
 export default [
   ...baseConfig,
   {
-    ignores: ['dist/**']
+    ignores: ['dist/**'],
   },
   {
     languageOptions: {
@@ -18,7 +18,7 @@ export default [
       },
       globals: {
         ...globals.browser,
-      }
-    }
-  }
+      },
+    },
+  },
 ]

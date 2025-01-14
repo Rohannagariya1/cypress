@@ -49,6 +49,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
     // rules that are gold standard, but have many violations
     // these are off while developing eslint, but will be set to warn
     rules: {
+      'no-console': 'error',
       'no-useless-escape': 'off',
       'prefer-const': 'off',
       'prefer-rest-params': 'off',
