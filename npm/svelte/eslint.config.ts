@@ -7,6 +7,6 @@ export default [
     files: ['src/mount.ts'],
     rules: {
       'cypress/no-unnecessary-waiting': 'warn',
-    }
-  }
+    },
+  },
 ]
