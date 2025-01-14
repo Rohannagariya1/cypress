@@ -57,6 +57,7 @@ describe('sourceDefaultWebpackDependencies', () => {
     describe(fixture, () => {
       it(`sources the correct webpack versions for ${fixture}`, async () => {
         const { result, projectRoot } = await sourceModulesForProject(fixture as ProjectDirs[number])
+        // eslint-disable-next-line no-restricted-syntax
         const projectNodeModules = fs.realpathSync(path.resolve(projectRoot, 'node_modules'))
 
         expect(result.webpack.majorVersion).to.eq(versionsToMatch.webpack, 'match webpackVersion')
@@ -72,6 +73,7 @@ describe('sourceDefaultWebpackDependencies', () => {
     const localWebpack = require('webpack')
 
     const { result, projectRoot } = await sourceModulesForProject('webpack5_wds5-react')
+    // eslint-disable-next-line no-restricted-syntax
     const projectNodeModules = fs.realpathSync(path.resolve(projectRoot, 'node_modules'))
 
     expect(localWebpack).not.to.eq(result.webpack.module)

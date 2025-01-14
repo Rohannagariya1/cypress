@@ -14,7 +14,7 @@ const debug = debugLib(debugPrefix)
 
 export type BuildOptions = Record<string, any>
 
-export type AngularWebpackDevServerConfig = Extract<WebpackDevServerConfig, {framework: 'angular'}>
+export type AngularWebpackDevServerConfig = Extract<WebpackDevServerConfig, { framework: 'angular' }>
 
 type Configurations = {
   configurations?: {

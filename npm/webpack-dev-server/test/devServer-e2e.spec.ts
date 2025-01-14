@@ -187,6 +187,7 @@ describe('#devServer', () => {
       absolute: `${root}/test/fixtures/bar.spec.js`,
     }
 
+    // eslint-disable-next-line no-restricted-syntax
     const oldmtime = fs.statSync(cypressConfig.indexHtmlFile).mtimeMs
 
     await once(devServerEvents, 'dev-server:compile:success')
@@ -195,6 +196,7 @@ describe('#devServer', () => {
     })
 
     await once(devServerEvents, 'dev-server:compile:success')
+    // eslint-disable-next-line no-restricted-syntax
     const updatedmtime = fs.statSync(cypressConfig.indexHtmlFile).mtimeMs
 
     expect(oldmtime).to.not.equal(updatedmtime)
