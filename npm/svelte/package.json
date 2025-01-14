@@ -8,7 +8,7 @@
     "build": "rollup -c rollup.config.mjs",
     "postbuild": "node ../../scripts/sync-exported-npm-with-cli.js",
     "check-ts": "tsc --noEmit",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, ."
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@cypress/mount-utils": "0.0.0-development",
