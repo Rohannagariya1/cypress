@@ -47,6 +47,14 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-identical-title': 'off', // warn
       'mocha/consistent-spacing-between-blocks': 'off',
     }
+  },
+
+  // common file patterns to ignore
+  {
+    ignores: [
+      '.releaserc.js',
+      'dist/**/*',
+    ]
   }
 ]
 
@@ -66,11 +74,11 @@ export default ts.config(
     ]
   },
   {
-    files: ['**/*.ts', '**/*.js'],
+    files: ['**/*.{ts,js}'],
     languageOptions: {
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: path.join(__dirname, './ts/tsconfig')
+        tsconfigRootDir: path.join(__dirname, './ts')
       },
       globals: {
         ...globals.node,

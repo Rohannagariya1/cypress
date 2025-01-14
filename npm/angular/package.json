@@ -9,7 +9,7 @@
     "postbuild": "node ../../scripts/sync-exported-npm-with-cli.js",
     "check-ts": "tsc --noEmit",
     "dev": "rollup -c rollup.config.mjs -w",
-    "lint": "eslint --ext .js,.ts,.json, ."
+    "lint": "eslint ."
   },
   "dependencies": {},
   "devDependencies": {
