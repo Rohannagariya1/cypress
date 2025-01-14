@@ -29,6 +29,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'no-prototype-builtins': 'off',
       'no-global-assign': 'off',
       'no-unsafe-finally': 'off',
+      'no-async-promise-executor': 'off',
 
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-require-imports': 'off',
@@ -46,6 +47,7 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
 
       'cypress/no-unnecessary-waiting': 'off',
       'cypress/unsafe-to-chain-command': 'off',
+      'cypress/no-async-tests': 'off',
     },
   },
 
