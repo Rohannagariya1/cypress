@@ -11,7 +11,7 @@
     "clean": "rimraf './{src,test}/**/*.js'",
     "clean-deps": "rimraf node_modules",
     "postinstall": "echo '@packages/graphql needs: yarn build'",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
+    "lint": "eslint .",
     "nexus-build": "ts-node ./scripts/nexus-build.ts",
     "test-integration": "mocha -r @packages/ts/register test/integration/**/*.spec.ts --config ./test/.mocharc.js --exit",
     "test-unit": "mocha -r @packages/ts/register test/unit/**/*.spec.ts --config ./test/.mocharc.js --exit",

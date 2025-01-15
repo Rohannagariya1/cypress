@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Takes all of the "Cloud" types and creates realistic mocks,
  * indexing the types in a way that we can access them
@@ -44,7 +43,7 @@ function getNodeIdx (type: CloudTypesWithId): number {
 }
 const btoa = typeof window !== 'undefined' ? window.btoa : (val: string) => Buffer.from(val).toString('base64')
 
-function testNodeId <T extends CloudTypesWithId> (type: T) {
+function testNodeId<T extends CloudTypesWithId> (type: T) {
   nodeIdx[type] = (nodeIdx[type] ?? 0) + 1
 
   return {
@@ -56,7 +55,7 @@ function testNodeId <T extends CloudTypesWithId> (type: T) {
 const nodeRegistry: Record<string, Node> = {}
 const projectsBySlug: Record<string, CloudProject> = {}
 
-function indexNode<T extends Node> (node: T & {__typename: CloudTypesWithId}): T {
+function indexNode<T extends Node> (node: T & { __typename: CloudTypesWithId }): T {
   nodeRegistry[node.id] = node
   if (node.__typename === 'CloudProject') {
     // @ts-expect-error

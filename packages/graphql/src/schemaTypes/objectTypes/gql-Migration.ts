@@ -241,8 +241,7 @@ export const Migration = objectType({
       description: 'whether the integration folder is custom or not',
       resolve: (source, args, ctx) => {
         return ctx.coreData.migration.flags.hasCustomIntegrationFolder
-      }
-      ,
+      },
     })
 
     t.nonNull.boolean('hasCustomIntegrationTestFiles', {
