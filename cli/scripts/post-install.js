@@ -24,6 +24,7 @@ fs.ensureDirSync(join(__dirname, '..', 'types'))
 
 includeTypes.forEach((folder) => {
   const source = resolvePkg(`@types/${folder}`, { cwd: __dirname })
+
   // eslint-disable-next-line no-restricted-syntax
   fs.copySync(source, join(__dirname, '..', 'types', folder))
 })
@@ -97,6 +98,7 @@ filesToUncomment.forEach((file) => {
   const result = str.split('\n').map((line) => {
     return line.startsWith('//z ') ? line.substring(4) : line
   }).join('\n')
+
   // eslint-disable-next-line no-restricted-syntax
   fs.writeFileSync(filePath, result)
 })
