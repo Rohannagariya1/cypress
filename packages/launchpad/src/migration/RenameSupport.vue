@@ -8,11 +8,15 @@
       {{ t('migration.renameSupport.changedSupportFile') }}
       <CodeTag
         class="text-red-500"
-      >cypress/support/index.js</CodeTag>
+      >
+        cypress/support/index.js
+      </CodeTag>
       <i-cy-arrow-right_x16 class="h-[16px] w-[16px] inline-block icon-dark-gray-300" />
       <CodeTag
         class="text-jade-500"
-      >cypress/support/e2e.js</CodeTag>
+      >
+        cypress/support/e2e.js
+      </CodeTag>
     </MigrationListItem>
   </MigrationList>
   <BeforeAfter>

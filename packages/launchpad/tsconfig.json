@@ -2,7 +2,8 @@
   "extends": "../frontend-shared/tsconfig.json",
   "include": [
     "src/**/*.vue", 
-    "src/**/*.tsx", 
+    "src/**/*.tsx",
+    "src/**/*.ts",
     "*.d.ts", 
     "cypress/**/*.ts", 
     "cypress/**/*.tsx",

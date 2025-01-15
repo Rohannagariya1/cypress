@@ -13,7 +13,7 @@
     "cypress:run:ct": "yarn cypress:run-cypress-in-cypress node ../../scripts/cypress run --component --project .",
     "cypress:run:e2e": "yarn cypress:run-cypress-in-cypress node ../../scripts/cypress run --e2e --project .",
     "dev": "yarn cypress:run-cypress-in-cypress gulp dev --project .",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
+    "lint": "eslint .",
     "start": "echo 'run yarn dev from the root' && exit 1",
     "test": "yarn cypress:run:ct && yarn types",
     "watch": "echo 'run yarn dev from the root' && exit 1"

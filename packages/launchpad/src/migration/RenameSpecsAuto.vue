@@ -149,7 +149,7 @@ function applySkipResult (val: PossibleOption) {
   emits('selectOption', selectOption.value)
 }
 
-type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> };
+type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> }
 
 type WriteableSpecFile = DeepWriteable<RenameSpecsAutoFragment['specFiles'][number]>
 
