@@ -2,6 +2,6 @@
   "extends": "../ts/tsconfig.json",
   "compilerOptions": {
     "target": "es2015",
-    "strict": false
-  }
+    "strict": false,
+  },
 }

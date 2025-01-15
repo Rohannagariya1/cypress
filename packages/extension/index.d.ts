@@ -2,4 +2,4 @@
 
 declare const lib: typeof import('./lib/extension')
 
-export default lib 
+export default lib

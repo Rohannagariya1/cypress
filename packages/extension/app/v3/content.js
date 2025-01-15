@@ -1,4 +1,4 @@
-/* global chrome, window */
+/* global chrome */
 
 // this content script has access to the DOM, but is otherwise isolated from
 // the page running Cypress, so we have to use postMessage to communicate. it
