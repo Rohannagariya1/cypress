@@ -6,7 +6,7 @@
   "scripts": {
     "clean-deps": "rimraf node_modules",
     "https": "node https.js",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
+    "lint": "eslint .",
     "regenerate:certs": "cd ./test/helpers/certs && ./regenerate-certs.sh",
     "start": "node index.js",
     "test": "yarn test-unit",
