@@ -1,9 +1,9 @@
-import { AppStudioShape, CloudApi } from '@packages/types'
-import { Router } from 'express'
+import type { AppStudioShape, CloudApi } from '@packages/types'
+import type { Router } from 'express'
 import path from 'path'
 import os from 'os'
 import Module from 'module'
-import { DataContext } from '../../DataContext'
+import type { DataContext } from '../../DataContext'
 
 const requireScript = (script: string) => {
   const mod = new Module('id', module)

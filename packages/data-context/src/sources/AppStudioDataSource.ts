@@ -1,7 +1,6 @@
-import { AppStudioShape, CloudApi } from '@packages/types'
-import { DataContext } from '../DataContext'
+import type { AppStudioShape, CloudApi } from '@packages/types'
+import type { DataContext } from '../DataContext'
 import { AppStudio } from './app-studio'
-import { agent } from '@packages/network'
 
 export class AppStudioDataSource {
   constructor (private ctx: DataContext) {}
@@ -32,7 +31,6 @@ export class AppStudioDataSource {
           'x-cypress-request-attempt': attemptIndex,
           'x-cypress-signature': publicKeyVersion,
         },
-        agent,
         encrypt: 'signed',
         resolveWithFullResponse: true,
       })
