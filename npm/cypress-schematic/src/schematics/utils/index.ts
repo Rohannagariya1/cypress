@@ -68,6 +68,7 @@ function generateCTSpec ({ tree, appPath, component }: { tree: Tree, appPath: st
   const componentMatch = componentString?.match(/(?<=class )\S+/g)
   const componentFilename = component['name'].split('.')[0]
   const componentName = componentMatch ? componentMatch[0] : componentFilename
+
  // eslint-disable-next-line no-console
   console.log(`Creating new component spec for: ${componentName}\n`)
 
