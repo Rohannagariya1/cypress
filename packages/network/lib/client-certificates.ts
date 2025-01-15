@@ -77,6 +77,7 @@ export class UrlClientCertificates {
     this.pathnameLength = new URL(url).pathname.length
     this.clientCertificates = new ClientCertificates()
   }
+
   clientCertificates: ClientCertificates
   url: string
   subjects: string
