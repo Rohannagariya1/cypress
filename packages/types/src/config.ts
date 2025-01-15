@@ -33,7 +33,7 @@ export type ReceivedCypressOptions =
   & Pick<Cypress.ResolvedConfigOptions, 'chromeWebSecurity' | 'supportFolder' | 'experimentalSourceRewriting' | 'fixturesFolder' | 'reporter' | 'reporterOptions' | 'screenshotsFolder' | 'supportFile' | 'baseUrl' | 'viewportHeight' | 'viewportWidth' | 'port' | 'experimentalInteractiveRunEvents' | 'userAgent' | 'downloadsFolder' | 'env' | 'excludeSpecPattern' | 'specPattern' | 'experimentalModifyObstructiveThirdPartyCode' | 'injectDocumentDomain' | 'video' | 'videoCompression' | 'videosFolder' | 'resolvedNodeVersion' | 'resolvedNodePath' | 'trashAssetsBeforeRuns' | 'experimentalWebKitSupport' | 'justInTimeCompile'> // TODO: Figure out how to type this better.
 
 export interface SettingsOptions {
-  testingType?: 'component' |'e2e'
+  testingType?: 'component' | 'e2e'
   args?: AllModeOptions
 }
 
