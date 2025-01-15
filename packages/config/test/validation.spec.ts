@@ -117,7 +117,7 @@ describe('config/src/validation', () => {
 
       // data-driven testing - computers snapshot value for each item in the list passed through the function
       // https://github.com/bahmutov/snap-shot-it#data-driven-testing
-      return snapshot.apply(null, [validation.isValidBrowser].concat(browsers as any))
+      return snapshot.apply(null, [validation.isValidBrowser, ...browsers])
     })
   })
 

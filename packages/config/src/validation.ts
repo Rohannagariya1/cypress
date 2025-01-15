@@ -40,7 +40,7 @@ const isFalse = (value: any): boolean => {
   return value === false
 }
 
-type ValidationResult = ErrResult | boolean | string;
+type ValidationResult = ErrResult | boolean | string
 type ValidationFn = (key: string, value: any) => ValidationResult
 
 export const validateAny = (...validations: ValidationFn[]): ValidationFn => {
@@ -107,7 +107,7 @@ export const isValidBrowserList = (_key: string, browsers: any): ErrResult | tru
   }
 
   for (let k = 0; k < browsers.length; k += 1) {
-    const validationResult: boolean | {key: string, value: string, type: string, list?: string} = isValidBrowser(browsers[k])
+    const validationResult: boolean | { key: string, value: string, type: string, list?: string } = isValidBrowser(browsers[k])
 
     if (validationResult !== true) {
       validationResult.list = 'browsers'
@@ -168,7 +168,7 @@ const isValidExperimentalRetryOptionsConfig = (key: string, value: any, strategy
   return true
 }
 
-const isValidRetryValue = (key: string, value: any, minimumValue: 0|1): ErrResult | true => {
+const isValidRetryValue = (key: string, value: any, minimumValue: 0 | 1): ErrResult | true => {
   if (_.isNull(value)) return true
 
   if (Number.isInteger(value) && value >= minimumValue) return true
@@ -330,7 +330,7 @@ export const isValidClientCertificatesSet = (_key: string, certsForUrls: Array<{
     key: string
     cert: string
     pfx: string
-  }>}>): ErrResult | true | string => {
+  }> }>): ErrResult | true | string => {
   debug('clientCerts: %o', certsForUrls)
 
   if (!Array.isArray(certsForUrls)) {
