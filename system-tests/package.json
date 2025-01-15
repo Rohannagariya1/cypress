@@ -8,7 +8,7 @@
   "scripts": {
     "build": "node ./scripts/scaffold.js",
     "clean-deps": "find . -depth -name node_modules -type d -exec rimraf {} \\;",
-    "lint": "eslint . --ext .js,.ts,.jsx,.tsx",
+    "lint": "eslint .",
     "preprojects:yarn:install": "yarn clean-deps",
     "projects:yarn:install": "node ./scripts/projects-yarn-install.js",
     "pretest": "yarn gulp ensureCloudValidations",

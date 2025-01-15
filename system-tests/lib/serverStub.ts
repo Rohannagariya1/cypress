@@ -72,7 +72,7 @@ export const postRunResponseWithProtocolDisabled = (response = postRunResponse) 
 
 type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
-};
+}
 const sendUploadUrls = function (req, res) {
   const { body } = req
 

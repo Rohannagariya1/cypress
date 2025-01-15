@@ -859,7 +859,6 @@ const systemTests = {
         const matches = browserNameVersionRe.exec(stdout)
 
         if (matches) {
-          // eslint-disable-next-line no-unused-vars
           const [, , customBrowserPath, browserName, version, headless] = matches
 
           const { browser } = options

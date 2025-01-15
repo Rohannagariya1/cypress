@@ -17,6 +17,7 @@ export class AppCaptureProtocol implements AppCaptureProtocolInterface {
   private events = {
     numberOfFontRequests: 0,
   }
+
   private cdpClient: any
 
   getDbMetadata (): { offset: number, size: number } {
