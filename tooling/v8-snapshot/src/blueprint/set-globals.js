@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-unused-vars
+//eslint-disable-next-line no-redeclare
 /* globals globalFunctionTrampoline, window, document, __pathResolver */
 
 /**
@@ -6,7 +6,6 @@
  * instances that are present in the app on startup.
  */
 
-// eslint-disable-next-line no-unused-vars
 (function () {
   let numberOfSetGlobalsCalls = 0
 
