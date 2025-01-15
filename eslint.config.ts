@@ -1,5 +1,6 @@
 import js from '@eslint/js'
 import ts, { InfiniteDepthConfigWithExtends } from 'typescript-eslint'
+// @ts-expect-error
 import cy from 'eslint-plugin-cypress/flat'
 import mocha from 'eslint-plugin-mocha'
 import globals from 'globals'
@@ -32,7 +33,18 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       parserOptions: {
         parser: ts.parser,
         projectService: true,
+        extraFileExtensions: ['.vue'],
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
+    },
+  },
+
+  // common node files
+  {
+    files: ['vite.config.mjs', 'webpack.config.*'],
+    languageOptions: {
       globals: {
         ...globals.node,
       },

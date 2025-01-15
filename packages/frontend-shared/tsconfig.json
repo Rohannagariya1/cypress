@@ -20,5 +20,6 @@
       "cypress-real-events", 
       "cypress"
     ],
+    "allowJs": true,
   }
 }
