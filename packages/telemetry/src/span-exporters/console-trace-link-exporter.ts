@@ -12,7 +12,7 @@ import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base'
 
 export class ConsoleTraceLinkExporter implements SpanExporter {
   private _traceUrl = ''
-  private _uniqueTraces: {[id: string]: string} = {}
+  private _uniqueTraces: { [id: string]: string } = {}
   // eslint-disable-next-line no-console
   private _log = console.log
 

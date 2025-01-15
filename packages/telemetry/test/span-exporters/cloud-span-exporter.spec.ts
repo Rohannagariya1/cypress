@@ -3,7 +3,7 @@ import type { ReadableSpan } from '@opentelemetry/sdk-trace-base'
 
 import { OTLPTraceExporter } from '../../src/span-exporters/cloud-span-exporter'
 
-const genericRequest = { encryption: { encryptRequest: ({ url, method, body }: {url: string, method: string, body: string}) => Promise.resolve({ jwe: 'req' }) } }
+const genericRequest = { encryption: { encryptRequest: ({ url, method, body }: { url: string, method: string, body: string }) => Promise.resolve({ jwe: 'req' }) } }
 
 describe('cloudSpanExporter', () => {
   describe('new', () => {

@@ -11,6 +11,7 @@
     "clean": "rimraf dist",
     "test": "yarn test-unit",
     "test-unit": "mocha --config ./test/.mocharc.js",
+    "lint": "eslint .",
     "tslint": "tslint --config ../ts/tslint.json --project .",
     "watch": "tsc --watch"
   },

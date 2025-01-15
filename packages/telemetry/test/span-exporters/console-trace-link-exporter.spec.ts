@@ -145,7 +145,6 @@ describe('consoleTraceLinkExporter', () => {
 
       //@ts-expect-error
       exporter._log = (...args) => {
-        console.log(args)
         expect(args[0]).to.equal('Trace end: [spanName] - https://ui.honeycomb.io/team/environments/environment/datasets/serviceName/trace?trace_id=traceId')
       }
 

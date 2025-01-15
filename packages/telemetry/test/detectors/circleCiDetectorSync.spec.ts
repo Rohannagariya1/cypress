@@ -90,8 +90,6 @@ describe('circleCiDetectorSync', () => {
       it('returns a resource with attributes', () => {
         const resource = circleCiDetectorSync.detect()
 
-        console.log(resource.attributes)
-
         expect(resource.attributes['ci.circle']).to.equal('circleCi')
         expect(resource.attributes['ci.branch']).to.equal('circleBranch')
         expect(resource.attributes['ci.job']).to.equal('circleJob')

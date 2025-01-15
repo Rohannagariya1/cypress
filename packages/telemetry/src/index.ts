@@ -15,9 +15,9 @@ const environment = (process.env.CYPRESS_CONFIG_ENV || process.env.CYPRESS_INTER
 
 const SERVICE_NAME = 'cypress-app'
 
-type AttachType = typeof types[number];
+type AttachType = typeof types[number]
 
-export type contextObject = {context?: { traceparent?: string }, attributes?: Attributes}
+export type contextObject = { context?: { traceparent?: string }, attributes?: Attributes }
 
 export type startSpanOptions = {
   name: string
@@ -48,7 +48,7 @@ export interface TelemetryApi {
 
 export class Telemetry implements TelemetryApi {
   tracer: Tracer
-  spans: {[key: string]: Span}
+  spans: { [key: string]: Span }
   activeSpanQueue: Span[]
   rootContext?: Context
   rootAttributes?: Attributes
@@ -87,9 +87,9 @@ export class Telemetry implements TelemetryApi {
     const resource = Resource.default().merge(
       new Resource({
         ...resources,
-        [ SemanticResourceAttributes.SERVICE_NAME ]: SERVICE_NAME,
-        [ SemanticResourceAttributes.SERVICE_NAMESPACE ]: namespace,
-        [ SemanticResourceAttributes.SERVICE_VERSION ]: version,
+        [SemanticResourceAttributes.SERVICE_NAME]: SERVICE_NAME,
+        [SemanticResourceAttributes.SERVICE_NAMESPACE]: namespace,
+        [SemanticResourceAttributes.SERVICE_VERSION]: version,
       }),
     )
 
@@ -353,26 +353,34 @@ export class TelemetryNoop implements TelemetryApi {
   startSpan () {
     return undefined
   }
+
   getSpan () {
     return undefined
   }
+
   findActiveSpan () {
     return undefined
   }
+
   endActiveSpanAndChildren () {
     return undefined
   }
+
   getActiveContextObject (): contextObject {
     return {}
   }
+
   getResources () {
     return {}
   }
+
   shutdown () {
     return Promise.resolve()
   }
+
   getExporter () {
     return undefined
   }
+
   setRootContext () {}
 }
