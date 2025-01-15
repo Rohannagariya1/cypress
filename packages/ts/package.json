@@ -7,7 +7,7 @@
     "check-ts": "tsc --noEmit",
     "clean-deps": "rimraf node_modules",
     "postinstall": "patch-package",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
+    "lint": "eslint  .",
     "test": "yarn test-unit",
     "test-unit": "node test",
     "test-watch": "echo 'no watching of tests'"
