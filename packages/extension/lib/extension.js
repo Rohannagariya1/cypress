@@ -1,3 +1,4 @@
+/* global __dirname */
 const path = require('path')
 const Promise = require('bluebird')
 const { getCookieUrl } = require('./util')
