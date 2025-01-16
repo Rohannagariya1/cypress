@@ -5,7 +5,6 @@ import cy from 'eslint-plugin-cypress/flat'
 // @ts-expect error - this package has no type defs
 import mocha from 'eslint-plugin-mocha'
 import globals from 'globals'
-import path from 'path'
 import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
 import * as graphql from '@graphql-eslint/eslint-plugin'
