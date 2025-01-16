@@ -1,7 +1,7 @@
+/* eslint-disable no-console */
 import 'sinon-chai'
 import style from 'ansi-styles'
 import chai, { expect } from 'chai'
-/* eslint-disable no-console */
 import chalk from 'chalk'
 import sinon, { SinonSpy } from 'sinon'
 import * as errors from '../../src'
@@ -84,9 +84,11 @@ describe('lib/errors', () => {
       })
 
       it('is not logged if a known Cypress error', () => {
-        const err = new Error('foo')
+        const err: Error & {
+          isCypressErr?: boolean
+        } = new Error('foo')
 
-        err['isCypressErr'] = true
+        err.isCypressErr = true
 
         const ret = errors.log(err)
 
@@ -97,7 +99,10 @@ describe('lib/errors', () => {
     })
 
     context('err.cause', () => {
-      let err
+      let err: Error & {
+        cause?: any
+        isCypressErr?: boolean
+      }
 
       beforeEach(() => {
         err = new Error('foo')

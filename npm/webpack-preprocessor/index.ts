@@ -1,7 +1,7 @@
 import Bluebird from 'bluebird'
 import Debug from 'debug'
 import _ from 'lodash'
-import * as events from 'events'
+import type * as events from 'events'
 import * as path from 'path'
 import webpack from 'webpack'
 import utils from './lib/utils'
@@ -275,7 +275,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       const jsonStats = stats.toJson()
 
       // these stats are really only useful for debugging
-      if (jsonStats.warnings.length > 0) {
+      if (jsonStats.warnings !== undefined && jsonStats.warnings.length > 0) {
         debug(`warnings for ${outputPath} %o`, jsonStats.warnings)
       }
 
@@ -284,7 +284,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
 
         const errorsToAppend = jsonStats.errors
         // remove stack trace lines since they're useless for debugging
-        .map(cleanseError)
+        ?.map(cleanseError)
         // multiple errors separated by newline
         .join('\n\n')
 
@@ -372,6 +372,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       }
     }
 
+    // @ts-ignore - this results in an error when check-ts'ing packages/driver, but not when check-ts webpack-preprocessor
     const bundler = file.shouldWatch ? compiler.watch(watchOptions, handle) : compiler.run(handle)
 
     // when the spec or project is closed, we need to clean up the cached

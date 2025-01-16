@@ -1,7 +1,7 @@
 const debug = require('debug')('cypress:webpack')
 const _ = require('lodash')
 
-import { CompilerOptions, CreateProgramOptions } from 'typescript'
+import type { CompilerOptions, CreateProgramOptions } from 'typescript'
 
 let patched = false
 

@@ -7828,6 +7828,13 @@
     "@types/cheerio" "*"
     "@types/react" "*"
 
+"@types/eslint-plugin-mocha@^10.4.0":
+  version "10.4.0"
+  resolved "https://registry.yarnpkg.com/@types/eslint-plugin-mocha/-/eslint-plugin-mocha-10.4.0.tgz#30fe04129f426c69cd46c061d101eec52cdedc57"
+  integrity sha512-knOH7Y13tuK0gqQqiiSucMxF4R/LrbRJwCiDQEhfbktUGvf9xFBQ8TdpCUO1xK0EwafOssu7+KuxqFV1xOXOtQ==
+  dependencies:
+    "@types/eslint" "*"
+
 "@types/eslint-scope@^3.7.3":
   version "3.7.3"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.3.tgz#125b88504b61e3c8bc6f870882003253005c3224"

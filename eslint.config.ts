@@ -1,7 +1,8 @@
 import js from '@eslint/js'
 import ts, { InfiniteDepthConfigWithExtends } from 'typescript-eslint'
-// @ts-expect-error
+// @ts-expect-error - this package has no type defs
 import cy from 'eslint-plugin-cypress/flat'
+// @ts-expect error - this package has no type defs
 import mocha from 'eslint-plugin-mocha'
 import globals from 'globals'
 import path from 'path'

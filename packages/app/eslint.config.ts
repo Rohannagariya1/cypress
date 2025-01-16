@@ -9,10 +9,10 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['eslint.config.ts']
-        }
-      }
-    }
+          allowDefaultProject: ['*.config.{ts,js,cjs,mjs}'],
+        },
+      },
+    },
   },
 
   {

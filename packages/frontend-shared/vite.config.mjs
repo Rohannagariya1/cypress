@@ -13,7 +13,6 @@ import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 
 import PkgConfig from 'vite-plugin-package-config'
 
-// @ts-expect-error
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -116,7 +115,6 @@ export const makeConfig = (config = {}, plugins = {}) => {
     css: {
       preprocessorOptions: {
         scss: {
-          // @ts-expect-error
           additionalData: `@use "file:///${path.resolve(__dirname, '../reporter/src/lib/variables.scss').replaceAll('\\', '/')}" as *;\n`,
         },
       },
