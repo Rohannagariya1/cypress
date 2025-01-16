@@ -23,11 +23,11 @@ export default [
       },
     },
   },
-  // cy tsx files in the src/ dir are component tests,
+  // {cy,spec}.tsx files in the src/ dir are component tests,
   // and since the components that are being rendered are vue
   // components and not react components, react rules do not apply.
   {
-    files: ['src/**/*.cy.{j,t}sx'],
+    files: ['src/**/*.{spec,cy}.tsx'],
     rules: {
       ...Object.keys(react.configs.flat.recommended.rules).reduce((rules, rule) => {
         return {
@@ -35,6 +35,7 @@ export default [
           [rule]: 'off',
         }
       }, {}),
+      'react/no-unknown-property': 'off',
     },
   },
 ]
