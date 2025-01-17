@@ -289,8 +289,6 @@ function openFile () {
   })
 }
 onMounted(() => {
-  import('app-studio').then((Studio) => Studio.helloWorld())
-
   const eventManager = getEventManager()
 
   // these events use GraphQL
@@ -317,6 +315,7 @@ onBeforeUnmount(() => {
 })
 
 Studio.helloWorld()
+Studio.triggerAISuggestion()
 
 </script>
 
