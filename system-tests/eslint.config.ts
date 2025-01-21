@@ -3,7 +3,7 @@ import globals from 'globals'
 
 export default [
   ...baseConfig,
-  { ignores: ['project-fixtures/**/*', 'projects/**/*'] },
+  { ignores: ['project-fixtures/**/*', 'projects/**/*', '/**/*.d.ts'] },
   {
     languageOptions: {
       parserOptions: {
