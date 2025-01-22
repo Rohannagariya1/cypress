@@ -55,6 +55,15 @@
         :width="panel3width"
       />
     </div>
+
+    <div
+      v-show="showPanel4"
+      data-cy="studio-panel"
+      class="grow h-full bg-gray-100 relative"
+      :style="{width: `${panel4Width}px`}"
+    >
+      <slot name="panel4" :width="panel4Width" />
+    </div>
   </div>
 </template>
 
@@ -72,21 +81,27 @@ import type { DraggablePanel } from './useRunnerStyle'
 const props = withDefaults(defineProps<{
   showPanel1?: boolean // specsList in runner
   showPanel2?: boolean // reporter in runner
+  showPanel4?: boolean // studio in runner
   initialPanel1Width?: number
   initialPanel2Width?: number
+  initialPanel4Width?: number
   minPanel1Width?: number
   minPanel2Width?: number
   minPanel3Width?: number
+  minPanel4Width?: number
   maxTotalWidth?: number // windowWidth in runner
   offsetLeft?: number
 }>(), {
   showPanel1: true,
   showPanel2: true,
+  showPanel4: true,
   initialPanel1Width: runnerConstants.defaultSpecListWidth,
   initialPanel2Width: runnerConstants.defaultReporterWidth,
+  initialPanel4Width: runnerConstants.defaultStudioWidth,
   minPanel1Width: 200,
   minPanel2Width: 220,
   minPanel3Width: 100,
+  minPanel4Width: 100,
   maxTotalWidth: window.innerWidth,
   offsetLeft: 0,
 })
@@ -102,6 +117,7 @@ const panel1IsDragging = ref(false)
 const panel2IsDragging = ref(false)
 const cachedPanel1Width = ref<number>(props.initialPanel1Width) // because panel 1 (the inline specs list) can be opened and closed in the UI, we cache the width
 const panel2Width = ref(props.initialPanel2Width)
+const panel4Width = ref(props.initialPanel4Width)
 
 const handleMousedown = (panel: DraggablePanel, event: MouseEvent) => {
   if (panel === 'panel1') {
@@ -141,7 +157,7 @@ const handleMouseup = () => {
 }
 
 const maxPanel1Width = computed(() => {
-  const unavailableWidth = panel2Width.value + props.minPanel3Width
+  const unavailableWidth = panel2Width.value + props.minPanel3Width + panel4Width.value
 
   return props.maxTotalWidth - unavailableWidth
 })
@@ -155,19 +171,21 @@ const panel1Width = computed(() => {
 })
 
 const maxPanel2Width = computed(() => {
-  const unavailableWidth = panel1Width.value + props.minPanel3Width
+  const unavailableWidth = panel1Width.value + props.minPanel3Width + panel4Width.value
 
   return props.maxTotalWidth - unavailableWidth
 })
 
 const panel3width = computed(() => {
-  const panel3SpaceAvailable = props.maxTotalWidth - panel1Width.value - panel2Width.value
+  console.log('panel3width', panel1Width.value, panel2Width.value, panel4Width.value)
+  const panel3SpaceAvailable = props.maxTotalWidth - panel1Width.value - panel2Width.value - panel4Width.value
 
   // minimumWithMargin - if panel 3 would end up below the minimum allowed size
   // due to window resizing, forcing the minimum width will create a horizontal scroll
   // so that on small windows users _can_ recover the AUT, just like Cy 9.x.
   const minimumWithBuffer = props.minPanel3Width
 
+  console.log(panel3SpaceAvailable < props.minPanel3Width ? minimumWithBuffer : panel3SpaceAvailable)
   return panel3SpaceAvailable < props.minPanel3Width ? minimumWithBuffer : panel3SpaceAvailable
 })
 
@@ -176,7 +194,7 @@ function handleResizeEnd (panel: DraggablePanel) {
 }
 
 function isNewWidthAllowed (mouseClientX: number, panel: DraggablePanel) {
-  const isMaxWidthSmall = props.maxTotalWidth < (panel1Width.value + panel2Width.value + props.minPanel3Width)
+  const isMaxWidthSmall = props.maxTotalWidth < (panel1Width.value + panel2Width.value + props.minPanel3Width + panel4Width.value)
   const fallbackWidth = 50
 
   if (panel === 'panel1') {

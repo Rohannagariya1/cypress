@@ -111,6 +111,7 @@ export class CloudDataSource {
   }
 
   reset () {
+    console.log('reset cloud urql client', `${this.getCloudUrl(cloudEnv)}/test-runner-graphql`)
     return this.#cloudUrqlClient = createClient({
       url: `${this.getCloudUrl(cloudEnv)}/test-runner-graphql`,
       exchanges: [

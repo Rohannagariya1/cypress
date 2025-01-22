@@ -25,6 +25,7 @@ export class AppStudio implements AppStudioShape {
 
   async setup (script: string, cloudApi: CloudApi): Promise<void> {
     if (script) {
+      console.log('setting up script')
       const cypressProtocolDirectory = path.join(os.tmpdir(), 'cypress', 'protocol')
 
       await this.ctx.fs.ensureDir(cypressProtocolDirectory)

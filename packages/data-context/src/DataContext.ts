@@ -187,7 +187,9 @@ export class DataContext {
   @cached
   get cloud () {
     return new CloudDataSource({
-      fetch: (input: RequestInfo | URL, init?: RequestInit) => this.util.fetch(input, init),
+      fetch: (input: RequestInfo | URL, init?: RequestInit) => {
+        return this.util.fetch(input, init)
+      },
       getUser: () => this.coreData.user,
       logout: () => this.actions.auth.logout().catch(this.logTraceError),
       invalidateClientUrqlCache: () => this.graphql.invalidateClientUrqlCache(this),

@@ -97,12 +97,24 @@
         />
         <ScreenshotHelperPixels />
       </template>
+      <template #panel4>
+        <HideDuringScreenshot
+          class="h-full"
+        >
+          <div
+            v-if="!hideCommandLog"
+            ref="studioContainer"
+            id="studio-panel"
+            class="w-full h-full force-dark"
+          />
+        </HideDuringScreenshot>
+      </template>
     </ResizablePanels>
   </AdjustRunnerStyleDuringScreenshot>
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { REPORTER_ID, RUNNER_ID } from './utils'
 import InlineSpecList from '../specs/InlineSpecList.vue'
 import { getAutIframeModel, getEventManager } from '.'
@@ -132,6 +144,8 @@ import StudioInstructionsModal from './studio/StudioInstructionsModal.vue'
 import StudioSaveModal from './studio/StudioSaveModal.vue'
 import { useStudioStore } from '../store/studio-store'
 import Studio from 'app-studio'
+import { makeUrqlClient } from '@packages/frontend-shared/src/graphql/urqlClient'
+import { getRunnerConfigFromWindow } from './get-runner-config-from-window'
 
 const {
   preferredMinimumPanelWidth,
@@ -185,6 +199,8 @@ mutation SpecRunnerOpenMode_OpenFileInIDE ($input: FileDetailsInput!) {
 const props = defineProps<{
   gql: SpecRunnerFragment
 }>()
+
+const studioContainer = ref<HTMLElement | null>(null)
 
 const eventManager = getEventManager()
 
@@ -288,7 +304,7 @@ function openFile () {
     },
   })
 }
-onMounted(() => {
+onMounted(async () => {
   const eventManager = getEventManager()
 
   // these events use GraphQL
@@ -308,6 +324,9 @@ onMounted(() => {
     preferences.update('isSpecsListOpen', state.isSpecsListOpen)
     preferences.update('autoScrollingEnabled', state.autoScrollingEnabled)
   })
+
+  const config = getRunnerConfigFromWindow()
+  Studio.renderInContainer(studioContainer.value!, { gql, client: await makeUrqlClient({ target: 'app', namespace: config.namespace, socketIoRoute: config.socketIoRoute }) })
 })
 
 onBeforeUnmount(() => {

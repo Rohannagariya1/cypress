@@ -18,6 +18,7 @@
       :initial-panel2-width="runnerUiStore.reporterWidth"
       :show-panel1="false"
       :show-panel2="!screenshotStore.isScreenshotting && !hideCommandLog"
+      :show-panel4="false"
       @resize-end="handleResizeEnd"
       @panel-width-updated="handlePanelWidthUpdated"
     >
