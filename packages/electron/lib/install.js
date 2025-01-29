@@ -176,6 +176,8 @@ module.exports = {
       return pkgr(options)
     })
     .then((appPaths) => {
+      console.log('appPaths', appPaths)
+
       return appPaths[0]
     })
     // Promise.resolve("tmp\\Cypress-win32-x64")
