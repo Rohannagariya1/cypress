@@ -4,7 +4,7 @@
 
 import { vi, describe, it, expect, beforeEach, MockedFunction } from 'vitest'
 
-import { toPosix } from '../../../../src/cypress/util/toPosix'
+import { toPosix } from '../../../../src/cypress/util/to_posix'
 
 describe('toPosix', () => {
   let config: MockedFunction<any>

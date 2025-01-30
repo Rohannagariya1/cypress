@@ -6,7 +6,7 @@ import { codeFrameColumns } from '@babel/code-frame'
 
 import $utils from './utils'
 import $sourceMapUtils from './source_map_utils'
-import { toPosix } from './util/toPosix'
+import { toPosix } from './util/to_posix'
 // Intentionally deep-importing from @packages/errors so as to not bundle the entire @packages/errors in the client unnecessarily
 import { getStackLines, replacedStack, stackWithoutMessage, splitStack, unsplitStack, stackLineRegex } from '@packages/errors/src/stackUtils'
 

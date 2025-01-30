@@ -5,8 +5,8 @@ import type { BasicSourceMapConsumer } from 'source-map'
 // @ts-ignore
 import mappingsWasm from 'source-map/lib/mappings.wasm'
 
-import $utils from './utils'
-import { toPosix } from './util/to_posix'
+import $utils from '../utils'
+import { toPosix } from './to_posix'
 
 const sourceMapExtractionRegex = /\/\/\s*[@#]\s*sourceMappingURL\s*=\s*(data:[^\s]*)/g
 const regexDataUrl = /data:[^;\n]+(?:;charset=[^;\n]+)?;base64,([a-zA-Z0-9+/]+={0,2})/ // matches data urls
