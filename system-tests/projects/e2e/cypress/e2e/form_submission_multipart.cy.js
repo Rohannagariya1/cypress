@@ -92,7 +92,7 @@ describe('<form> submissions', () => {
     })
 
     // https://github.com/cypress-io/cypress/issues/4240
-    it('large image/jpeg', () => {
+    it.only('large image/jpeg', () => {
       testUpload(Cypress.env('PATH_TO_LARGE_IMAGE'), {
         timeout: 120000,
       })

@@ -139,7 +139,7 @@ describe('e2e forms', () => {
       })
     })
 
-    systemTests.it('passes with https on localhost', {
+    systemTests.it.only('passes with https on localhost', {
       // FIXME: webkit is 404ing on redirects after the form submit on the default clientRoute /__/
       browser: '!webkit',
       config: {

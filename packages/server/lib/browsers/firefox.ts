@@ -626,8 +626,9 @@ export async function open (browser: Browser, url: string, options: BrowserLaunc
       },
     },
     jsdebugger: Debug.enabled(GECKODRIVER_DEBUG_NAMESPACE_VERBOSE) || false,
-    log: Debug.enabled(GECKODRIVER_DEBUG_NAMESPACE_VERBOSE) ? 'debug' : 'error',
+    log: Debug.enabled(GECKODRIVER_DEBUG_NAMESPACE_VERBOSE) ? 'trace' : 'error',
     logNoTruncate: Debug.enabled(GECKODRIVER_DEBUG_NAMESPACE_VERBOSE),
+    enableCrashReporter: true,
   }
 
   // since we no longer directly control the browser with webdriver, we need to make the browserInstance
@@ -653,9 +654,11 @@ export async function open (browser: Browser, url: string, options: BrowserLaunc
         err ? reject(err) : resolve(encodedProfile)
       })
     })
+    // const crashLogDirectory = path.resolve(__dirname, '../../../../')
 
     const newSessionCapabilities: RemoteConfig = {
-      logLevel: Debug.enabled(WEBDRIVER_DEBUG_NAMESPACE_VERBOSE) ? 'info' : 'silent',
+      logLevel: Debug.enabled(WEBDRIVER_DEBUG_NAMESPACE_VERBOSE) ? 'trace' : 'silent',
+      // outputDir: Debug.enabled(WEBDRIVER_DEBUG_NAMESPACE_VERBOSE) ? crashLogDirectory : undefined,
       capabilities: {
         alwaysMatch: {
           browserName: 'firefox',

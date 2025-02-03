@@ -25,7 +25,7 @@ index eed6f39..503f305 100644
  import { locateChrome, locateFirefox, locateApp } from "locate-app";
  var log = logger("webdriver");
 +// wrap in cypress debugger statement to avoid extraneous messages to the console
-+log.setLevel(debugModule.enabled('cypress-verbose:server:browsers:webdriver') ? 'info' : 'silent')
++log.setLevel(debugModule.enabled('cypress-verbose:server:browsers:webdriver') ? 'trace' : 'silent')
  var EXCLUDED_PARAMS = ["version", "help"];
  var canAccess = (file) => {
    if (!file) {
@@ -34,7 +34,7 @@ index eed6f39..503f305 100644
  // src/node/startWebDriver.ts
  var log2 = logger2("@wdio/utils");
 +// wrap in cypress debugger statement to avoid extraneous messages to the console
-+log2.setLevel(debugModule.enabled('cypress-verbose:server:browsers:webdriver') ? 'info' : 'silent')
++log2.setLevel(debugModule.enabled('cypress-verbose:server:browsers:webdriver') ? 'trace' : 'silent')
  var DRIVER_WAIT_TIMEOUT = 10 * 1e3;
  async function startWebDriver(options) {
    if (process.env.WDIO_SKIP_DRIVER_SETUP) {

@@ -257,7 +257,7 @@ index 2edc6d2..a24617e 100644
  const log = logger('geckodriver');
  export async function start(params) {
 +    // wrap in cypress debugger statement to avoid extraneous messages to the console
-+    log.setLevel(debugModule.enabled('cypress-verbose:server:browsers:geckodriver') ? 'info' : 'silent')
++    log.setLevel(debugModule.enabled('cypress-verbose:server:browsers:geckodriver') ? 'trace' : 'silent')
 +
      const { cacheDir, customGeckoDriverPath, spawnOpts, ...startArgs } = params;
      let geckoDriverPath = (customGeckoDriverPath ||
