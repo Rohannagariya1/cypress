@@ -1584,7 +1584,6 @@ jobs:
       required_env_var:
         type: env_var_name
     steps:
-      - restore_cached_workspace
       - run:
           # if this is an external pull request, the environment variables
           # are NOT set for security reasons, thus no need to to finalize Percy,
@@ -1598,12 +1597,10 @@ jobs:
               circleci-agent step halt
             fi
       - run:
-          # Sometimes, even though all the circle jobs have finished, Percy times out during `build:finalize`
-          # If all other jobs finish but `build:finalize` fails, we retry it once
-          name: Finalize percy build - allows single retry
+          name: Finalize percy build
           command: |
-            PERCY_PARALLEL_NONCE=$CIRCLE_WORKFLOW_WORKSPACE_ID \
-            yarn percy build:finalize || yarn percy build:finalize
+            sudo npm install -g @percy/cli@^1.3.0
+            PERCY_PARALLEL_NONCE=$CIRCLE_WORKFLOW_WORKSPACE_ID npx percy build:finalize
 
   # verify accessibility scores from Cypress
   verify-accessibility-results:
