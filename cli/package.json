@@ -1,8 +1,57 @@
 {
+  "private": true,
   "name": "cypress",
   "version": "0.0.0-development",
-  "private": true,
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./index.mjs",
+      "require": "./index.js"
+    },
+    "./vue": {
+      "types": "./vue/dist/index.d.ts",
+      "import": "./vue/dist/cypress-vue.esm-bundler.js",
+      "require": "./vue/dist/cypress-vue.cjs.js"
+    },
+    "./package.json": {
+      "import": "./package.json",
+      "require": "./package.json"
+    },
+    "./react": {
+      "types": "./react/dist/index.d.ts",
+      "import": "./react/dist/cypress-react.esm-bundler.js",
+      "require": "./react/dist/cypress-react.cjs.js"
+    },
+    "./mount-utils": {
+      "types": "./mount-utils/dist/index.d.ts",
+      "require": "./mount-utils/dist/index.js"
+    },
+    "./angular": {
+      "types": "./angular/dist/index.d.ts",
+      "import": "./angular/dist/index.js",
+      "require": "./angular/dist/index.js"
+    },
+    "./svelte": {
+      "types": "./svelte/dist/index.d.ts",
+      "import": "./svelte/dist/cypress-svelte.esm-bundler.js",
+      "require": "./svelte/dist/cypress-svelte.cjs.js"
+    }
+  },
   "main": "index.js",
+  "bin": {
+    "cypress": "bin/cypress"
+  },
+  "files": [
+    "angular",
+    "bin",
+    "index.mjs",
+    "lib",
+    "mount-utils",
+    "react",
+    "svelte",
+    "types/**/*.d.ts",
+    "vue"
+  ],
   "scripts": {
     "build-cli": "node ./scripts/build.js && node ./scripts/post-build.js",
     "clean": "node ./scripts/clean.js",
@@ -19,8 +68,14 @@
     "types": "yarn dtslint",
     "unit": "cross-env BLUEBIRD_DEBUG=1 NODE_ENV=test mocha --reporter mocha-multi-reporters --reporter-options configFile=../mocha-reporter-config.json"
   },
+  "types": "types",
+  "workspaces": {
+    "nohoist": [
+      "@types/*"
+    ]
+  },
   "dependencies": {
-    "@cypress/request": "^3.0.6",
+    "@cypress/request": "^3.0.7",
     "@cypress/xvfb": "^1.2.4",
     "@types/sinonjs__fake-timers": "8.1.1",
     "@types/sizzle": "^2.3.2",
@@ -104,64 +159,8 @@
     "spawn-mock": "1.0.0",
     "strip-ansi": "6.0.1"
   },
-  "files": [
-    "bin",
-    "lib",
-    "index.js",
-    "index.mjs",
-    "types/**/*.d.ts",
-    "mount-utils",
-    "vue",
-    "react",
-    "angular",
-    "svelte"
-  ],
-  "bin": {
-    "cypress": "bin/cypress"
-  },
   "engines": {
     "node": "^18.0.0 || ^20.0.0 || >=22.0.0"
-  },
-  "types": "types",
-  "exports": {
-    ".": {
-      "types": "./types/index.d.ts",
-      "import": "./index.mjs",
-      "require": "./index.js"
-    },
-    "./vue": {
-      "types": "./vue/dist/index.d.ts",
-      "import": "./vue/dist/cypress-vue.esm-bundler.js",
-      "require": "./vue/dist/cypress-vue.cjs.js"
-    },
-    "./package.json": {
-      "import": "./package.json",
-      "require": "./package.json"
-    },
-    "./react": {
-      "types": "./react/dist/index.d.ts",
-      "import": "./react/dist/cypress-react.esm-bundler.js",
-      "require": "./react/dist/cypress-react.cjs.js"
-    },
-    "./mount-utils": {
-      "types": "./mount-utils/dist/index.d.ts",
-      "require": "./mount-utils/dist/index.js"
-    },
-    "./angular": {
-      "types": "./angular/dist/index.d.ts",
-      "import": "./angular/dist/index.js",
-      "require": "./angular/dist/index.js"
-    },
-    "./svelte": {
-      "types": "./svelte/dist/index.d.ts",
-      "import": "./svelte/dist/cypress-svelte.esm-bundler.js",
-      "require": "./svelte/dist/cypress-svelte.cjs.js"
-    }
-  },
-  "workspaces": {
-    "nohoist": [
-      "@types/*"
-    ]
   },
   "nx": {
     "targets": {

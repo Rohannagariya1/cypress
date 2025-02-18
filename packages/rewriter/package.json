@@ -1,16 +1,28 @@
 {
+  "private": true,
   "name": "@packages/rewriter",
   "version": "0.0.0-development",
-  "private": true,
   "main": "index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "build-prod": "tsc --project .",
     "build-test": "yarn build-prod --noEmit",
-    "check-ts": "tsc --noEmit",
+    "check-ts": "tsc --noEmit && yarn -s tslint",
     "clean": "rimraf 'lib/**/*.js'",
     "clean-deps": "rimraf node_modules",
     "lint": "eslint .",
     "test": "mocha --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json"
+  },
+  "types": "./lib/index.ts",
+  "workspaces": {
+    "nohoist": [
+      "parse5-html-rewriting-stream",
+      "parse5-html-rewriting-stream/**",
+      "@types/parse5-html-rewriting-stream",
+      "@types/parse5-html-rewriting-stream/**"
+    ]
   },
   "dependencies": {
     "ast-types": "0.13.3",
@@ -30,18 +42,6 @@
     "sinon": "9.0.2",
     "sinon-chai": "3.5.0",
     "snap-shot-it": "7.9.3"
-  },
-  "files": [
-    "lib"
-  ],
-  "types": "./lib/index.ts",
-  "workspaces": {
-    "nohoist": [
-      "parse5-html-rewriting-stream",
-      "parse5-html-rewriting-stream/**",
-      "@types/parse5-html-rewriting-stream",
-      "@types/parse5-html-rewriting-stream/**"
-    ]
   },
   "nx": {}
 }
