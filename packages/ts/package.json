@@ -1,8 +1,12 @@
 {
+  "private": true,
   "name": "@packages/ts",
   "version": "0.0.0-development",
-  "private": true,
   "main": "index.js",
+  "files": [
+    "register.js",
+    "registerDir.js"
+  ],
   "scripts": {
     "check-ts": "tsc --noEmit",
     "clean-deps": "rimraf node_modules",
@@ -18,10 +22,8 @@
     "tslib": "2.3.1",
     "typescript-cached-transpile": "^0.0.6"
   },
-  "devDependencies": {},
-  "files": [
-    "register.js",
-    "registerDir.js"
-  ],
+  "devDependencies": {
+    "@tooling/eslint-config": "0.0.0-development"
+  },
   "nx": {}
 }
