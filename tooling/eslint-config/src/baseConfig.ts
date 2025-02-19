@@ -232,6 +232,10 @@ export default <InfiniteDepthConfigWithExtends[]>[
       // we use react 18+, so these rules do not apply
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
+
+      // these are generally noisy, and not that helpful at this point. Maybe
+      // down the line we can enable them.
+      'import-x/no-named-as-default-member': 'off',
     },
   },
 

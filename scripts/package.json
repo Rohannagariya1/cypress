@@ -1,9 +1,12 @@
 {
+  "private": true,
   "name": "internal-scripts",
   "version": "0.0.0-development",
-  "private": true,
   "scripts": {
     "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@tooling/eslint-config": "0.0.0-development"
   },
   "nx": {}
 }
