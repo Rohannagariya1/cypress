@@ -474,15 +474,6 @@ const util = {
 
       if (osArch === 'arm64') return 'arm64'
 
-      if (osPlatform === 'darwin') {
-        // could possibly be x64 node on arm64 darwin, check if we are being translated by Rosetta
-        // https://stackoverflow.com/a/65347893/3474615
-        const { stdout } = await execa('sysctl', ['-n', 'sysctl.proc_translated']).catch(() => '')
-
-        debug('rosetta check result: %o', { stdout })
-        if (stdout === '1') return 'arm64'
-      }
-
       if (osPlatform === 'linux') {
         // could possibly be x64 node on arm64 linux, check the "machine hardware name"
         // list of names for reference: https://stackoverflow.com/a/45125525/3474615
