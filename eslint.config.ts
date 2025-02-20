@@ -9,6 +9,7 @@ import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
 import * as graphql from '@graphql-eslint/eslint-plugin'
 import react from 'eslint-plugin-react'
+import eslintPluginImportX from 'eslint-plugin-import-x'
 
 /**
  * baseConfig should be imported by other packages that define their own eslint.config.ts
@@ -25,6 +26,8 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   cy.configs.recommended,
   mocha.configs.flat.recommended,
   ...vue.configs['flat/recommended'],
+  eslintPluginImportX.flatConfigs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
   {
     ...react.configs.flat.recommended,
     settings: {
@@ -236,6 +239,13 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       // we use react 18+, so these rules do not apply
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
+
+      // some import-x rules are off rather than warn, because they can be a little bit noisy in stdout
+      'import-x/namespace': 'off', // sometimes we import modules as namespaces when we don't intend to, e.g. `import * as sinon from 'sinon'`
+      'import-x/no-unresolved': 'off', // import-x has trouble resolving some things, like css from .vue
+      'import-x/no-named-as-default-member': 'off', // e.g., import foo from 'foo'; foo.bar(); will error when `bar` is a named export
+      'import-x/default': 'off',
+      'import-x/export': 'off',
     },
   },
 
