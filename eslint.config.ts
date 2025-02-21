@@ -4,15 +4,16 @@ import ts, { InfiniteDepthConfigWithExtends } from 'typescript-eslint'
 import cy from 'eslint-plugin-cypress/flat'
 // @ts-expect error - this package has no type defs
 import mocha from 'eslint-plugin-mocha'
-import globals from 'globals'
+import Globals from 'globals'
 import vue from 'eslint-plugin-vue'
 import stylistic from '@stylistic/eslint-plugin'
 import * as graphql from '@graphql-eslint/eslint-plugin'
 import react from 'eslint-plugin-react'
 import eslintPluginImportX from 'eslint-plugin-import-x'
 
+export const globals = Globals
 /**
- * baseConfig should be imported by other packages that define their own eslint.config.ts
+ * defaultConfig should be imported by other packages that define their own eslint.config.ts
  * tsLanguageOptions may be shared, but is probably unnecessary
  * the default config exported from this file applies to
  *   - ./scripts/*
@@ -20,64 +21,22 @@ import eslintPluginImportX from 'eslint-plugin-import-x'
  * This can be simplified if ./scripts is converted to a monorepo package in /tooling
  */
 
-export const baseConfig: InfiniteDepthConfigWithExtends[] = [
-  js.configs.recommended,
-  ...ts.configs.recommended,
-  cy.configs.recommended,
-  mocha.configs.flat.recommended,
-  ...vue.configs['flat/recommended'],
-  eslintPluginImportX.flatConfigs.recommended,
-  eslintPluginImportX.flatConfigs.typescript,
-  {
-    ...react.configs.flat.recommended,
-    settings: {
-      react: {
-        version: '18',
-      },
-    },
-  },
-  stylistic.configs.customize({
-    'braceStyle': '1tbs',
-    'arrowParens': true,
-  }),
+/**
+ * Add vueConfig instead of typescript config when using Vue
+ */
 
-  // set up ts parser
-  {
-    files: ['**/*.{ts,js,jsx,tsx,vue}'],
-    languageOptions: {
-      parserOptions: {
-        parser: ts.parser,
-        projectService: true,
-        extraFileExtensions: ['.vue'],
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
-  },
-
-  // graphql parser
-  {
-    files: ['*.graphql'],
-    ...graphql.flatConfigs['operations-recommended'],
-  },
-
-  // common node files
-  {
-    files: ['vite.config.mjs', 'webpack.config.*'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-
-  // overrides for stylistic rules
+/**
+ * These override default rules to conform to the prevelant style in the repo.
+ * Some are disabled or set to warn because they are not applied consistently
+ * throughout the repo.
+ */
+const styleOverrides: InfiniteDepthConfigWithExtends[] = [
   {
     rules: {
       '@stylistic/space-before-function-paren': ['error', 'always'],
       '@stylistic/comma-dangle': ['error', 'always-multiline'],
       '@stylistic/multiline-ternary': 'off',
+
       // the following rules are very inconsistent across the codebase.
       // enabling them, even with customized options, may result in large diffs.
       '@stylistic/indent': 'off', // ['warn', 2, { MemberExpression: 0 }],
@@ -102,8 +61,6 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       '@stylistic/jsx-quotes': 'off',
     },
   },
-
-  // overrides for basic recommended rules, and custom rules
   {
     rules: {
       'no-console': 'error',
@@ -133,13 +90,13 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'padding-line-between-statements': [
         'error',
         {
-          'blankLine': 'always',
-          'prev': '*',
-          'next': 'return',
+          blankLine: 'always',
+          prev: '*',
+          next: 'return',
         },
         {
-          'blankLine': 'always',
-          'prev': [
+          blankLine: 'always',
+          prev: [
             'const',
             'let',
             'var',
@@ -151,18 +108,18 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
             'cjs-import',
             'multiline-expression',
           ],
-          'next': '*',
+          next: '*',
         },
         {
-          'blankLine': 'any',
-          'prev': [
+          blankLine: 'any',
+          prev: [
             'const',
             'let',
             'var',
             'import',
             'cjs-import',
           ],
-          'next': [
+          next: [
             'const',
             'let',
             'var',
@@ -173,10 +130,17 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       ],
     },
   },
+]
 
+/**
+ * Rules that are gold standard, but have many violations. They are aspirational.
+ * When working on conformation process, override to warn or error one at a time
+ * in the package's eslint config that you're working on. Once there are no more
+ * errors for an entry, it can be removed - the default recommended configs will
+ * apply.
+ */
+const baseOverrides: InfiniteDepthConfigWithExtends[] = [
   {
-    // rules that are gold standard, but have many violations
-    // these are off while developing eslint, but will be set to warn
     rules: {
       'no-useless-escape': 'off',
       'prefer-const': 'off',
@@ -187,19 +151,6 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'no-async-promise-executor': 'off',
       'no-unsafe-optional-chaining': 'off',
       'prefer-spread': 'warn',
-
-      '@typescript-eslint/no-unused-expressions': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-unsafe-function-type': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-namespace': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-this-alias': 'off',
-      '@typescript-eslint/triple-slash-reference': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-wrapper-object-types': 'off',
-      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
 
       'mocha/no-mocha-arrows': 'off',
       'mocha/no-setup-in-describe': 'off',
@@ -216,29 +167,10 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'mocha/no-pending-tests': 'off',
       'mocha/no-nested-tests': 'off',
 
-      'vue/multi-word-component-names': 'off',
-      'vue/html-closing-bracket-spacing': 'off',
-      'vue/no-dupe-keys': 'off',
-      'vue/v-on-event-hyphenation': 'off',
-      'vue/attribute-hyphenation': 'off',
-      'vue/no-useless-template-attributes': 'off',
-
       'cypress/no-unnecessary-waiting': 'off',
       'cypress/unsafe-to-chain-command': 'off',
       'cypress/no-async-tests': 'off',
       'cypress/no-assigning-return-values': 'off',
-
-      'react/no-string-refs': 'warn',
-      'react/prop-types': 'warn',
-      'react/no-unescaped-entities': 'warn',
-      'react/jsx-no-target-blank': 'warn',
-      'react/no-unknown-property': 'warn',
-      'react/jsx-key': 'warn',
-      'react/display-name': 'warn',
-
-      // we use react 18+, so these rules do not apply
-      'react/react-in-jsx-scope': 'off',
-      'react/jsx-uses-react': 'off',
 
       // some import-x rules are off rather than warn, because they can be a little bit noisy in stdout
       'import-x/namespace': 'off', // sometimes we import modules as namespaces when we don't intend to, e.g. `import * as sinon from 'sinon'`
@@ -247,6 +179,33 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
       'import-x/default': 'off',
       'import-x/export': 'off',
       'import-x/no-extraneous-dependencies': 'warn',
+    },
+  },
+]
+
+const overrides = [
+  ...styleOverrides,
+  ...baseOverrides,
+]
+
+const baseConfig: InfiniteDepthConfigWithExtends[] = [
+  js.configs.recommended,
+  cy.configs.recommended,
+  mocha.configs.flat.recommended,
+  eslintPluginImportX.flatConfigs.recommended,
+
+  stylistic.configs.customize({
+    braceStyle: '1tbs',
+    arrowParens: true,
+  }),
+
+  // common node files
+  {
+    files: ['vite.config.mjs', 'webpack.config.*'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
 
@@ -275,11 +234,11 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   // cy, *sx, and vue files are always in browser
   {
     files: ['**/*.cy.{js,ts}', '**/*.{j,t}sx', '**/*.vue'],
-      languageOptions: {
-        globals: {
-          ...globals['browser'],
-        },
+    languageOptions: {
+      globals: {
+        ...globals['browser'],
       },
+    },
   },
 
   {
@@ -290,10 +249,136 @@ export const baseConfig: InfiniteDepthConfigWithExtends[] = [
   },
 ]
 
+const typescriptConfig = ts.config(
+  ...ts.configs.recommended,
+  eslintPluginImportX.flatConfigs.typescript,
+  {
+    rules: {
+      '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-this-alias': 'off',
+      '@typescript-eslint/triple-slash-reference': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/no-wrapper-object-types': 'off',
+      '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    },
+  },
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [ts.configs.disableTypeChecked],
+  },
+)
+
+const baseVueConfig = ts.config(
+  ...vue.configs['flat/recommended'],
+  {
+
+    files: ['**/*.{ts,vue}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.browser,
+      parserOptions: {
+        parser: ts.parser,
+        extraFileExtensions: ['.vue'],
+      },
+    },
+    rules: {
+      'vue/multi-word-component-names': 'off',
+      'vue/html-closing-bracket-spacing': 'off',
+      'vue/no-dupe-keys': 'off',
+      'vue/v-on-event-hyphenation': 'off',
+      'vue/attribute-hyphenation': 'off',
+      'vue/no-useless-template-attributes': 'off',
+    },
+  },
+)
+
+export const vueConfig = ts.config(
+  ...baseConfig,
+  ...typescriptConfig,
+  ...baseVueConfig,
+  ...overrides,
+)
+
+/**
+ * Use reactConfig when using react. Take care not to include both react and
+ * vue configs in the same project - they conflict in weird ways.
+ */
+
+const baseReactConfig = ts.config(
+  {
+    ...react.configs.flat.recommended,
+    files: ['**/*.{jsx,tsx}'],
+    settings: {
+      react: {
+        version: '18',
+      },
+    },
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    rules: {
+      'react/no-string-refs': 'warn',
+      'react/prop-types': 'warn',
+      'react/no-unescaped-entities': 'warn',
+      'react/jsx-no-target-blank': 'warn',
+      'react/no-unknown-property': 'warn',
+      'react/jsx-key': 'warn',
+      'react/display-name': 'warn',
+      // we use react 18+, so these rules do not apply
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
+    },
+  },
+)
+
+export const reactConfig = ts.config(
+  ...baseConfig,
+  ...typescriptConfig,
+  ...baseReactConfig,
+  ...overrides,
+)
+
+export const combinedReactVueConfig = ts.config(
+  ...baseConfig,
+  ...typescriptConfig,
+  ...baseVueConfig,
+  ...baseReactConfig,
+  ...overrides,
+)
+
+// some packages need to disable all of the react rules for a subset of files
+export const disabledReactRules = {
+  ...Object.keys(react.configs.flat.recommended.rules).reduce((rules, rule) => {
+    return {
+      ...rules,
+      [rule]: 'off',
+    }
+  }, {}),
+  'react/no-unknown-property': 'off',
+}
+
+export const defaultConfig = ts.config(
+  ...baseConfig,
+  ...typescriptConfig,
+  ...overrides,
+)
 // applies to ./scripts - eslint tends to crash if this config is in the ./scripts dir?
 
 export default ts.config(
-  ...baseConfig,
+  ...defaultConfig,
+  ...typescriptConfig,
+  ...overrides,
   {
     ignores: [
       'npm/**/*',

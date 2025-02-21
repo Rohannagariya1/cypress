@@ -1,8 +1,7 @@
-import { baseConfig } from '../../eslint.config'
-import globals from 'globals'
+import { defaultConfig, globals } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   {
     ignores: ['cypress/fixtures/**/*', 'src/config/jquery.scrollto.ts'],
   },
@@ -21,9 +20,7 @@ export default [
   {
     files: ['cypress/plugins/*'],
     languageOptions: {
-      globals: {
-        ...globals['node'],
-      },
+      globals: globals.node,
     },
   },
 ]

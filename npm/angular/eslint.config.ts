@@ -1,9 +1,9 @@
-import { baseConfig } from '../../eslint.config'
+import { defaultConfig } from '../../eslint.config'
 import path from 'path'
 import globals from 'globals'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   {
     ignores: ['dist/**'],
   },

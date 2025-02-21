@@ -1,7 +1,7 @@
-import { baseConfig } from '../../eslint.config'
+import { defaultConfig } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   {
     ignores: ['test/.mocharc.js'],
   },

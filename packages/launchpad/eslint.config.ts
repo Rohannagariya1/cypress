@@ -1,7 +1,7 @@
-import { baseConfig } from '../../eslint.config'
+import { vueConfig } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...vueConfig,
   {
     ignores: ['src/generated/**/*', 'cypress/**/fixtures/**/*'],
   },

@@ -1,9 +1,7 @@
-import { baseConfig } from '../../eslint.config'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
+import { reactConfig } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...reactConfig,
   {
     languageOptions: {
       parserOptions: {
@@ -15,8 +13,6 @@ export default [
   },
   {
     rules: {
-      'react/prop-types': 'warn',
-      'react/display-name': 'warn',
       'no-console': 'warn',
     },
   },

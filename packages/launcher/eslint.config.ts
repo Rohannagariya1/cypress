@@ -1,6 +1,5 @@
-import { baseConfig } from '../../eslint.config'
-import path from 'path'
+import { defaultConfig } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
 ]

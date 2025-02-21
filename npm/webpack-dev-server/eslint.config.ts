@@ -1,8 +1,8 @@
-import { baseConfig } from '../../eslint.config'
+import { defaultConfig } from '../../eslint.config'
 import globals from 'globals'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   {
     ignores: ['__snapshots__/**/*', 'test/fixtures/compilation-fails.spec.js', 'test/.mocharc.js'],
   },

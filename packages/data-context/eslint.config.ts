@@ -1,10 +1,13 @@
-import { baseConfig } from '../../eslint.config'
+import { combinedReactVueConfig } from '../../eslint.config'
 import globals from 'globals'
 
 export default [
-  ...baseConfig,
+  ...combinedReactVueConfig,
   {
-    ignores: ['index.js'],
+    ignores: [
+      'index.js',
+      'test/unit/actions/project/empty.jsx', // this is just an empty file, but vue complains
+    ],
   },
   {
     languageOptions: {

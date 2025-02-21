@@ -1,8 +1,8 @@
-import { baseConfig } from '../../eslint.config'
+import { defaultConfig } from '../../eslint.config'
 import globals from 'globals'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   { ignores: ['test/fixtures/**/*', 'index.js'] },
   {
   languageOptions: {

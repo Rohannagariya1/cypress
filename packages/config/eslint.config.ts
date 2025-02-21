@@ -1,8 +1,7 @@
-import { baseConfig } from '../../eslint.config'
-import globals from 'globals'
+import { defaultConfig } from '../../eslint.config'
 
 export default [
-  ...baseConfig,
+  ...defaultConfig,
   {
     ignores: ['**/__babel_fixtures__/**/*', 'index.js'],
   },
