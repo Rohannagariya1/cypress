@@ -21,7 +21,7 @@ describe('./lib/typescript-overrides', () => {
     it('it sets sourceMap: true', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(true)
 
@@ -43,7 +43,7 @@ describe('./lib/typescript-overrides', () => {
     it('it sets sourceMap: false', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(false)
 
@@ -65,7 +65,7 @@ describe('./lib/typescript-overrides', () => {
     it('sets options when given an array', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(true)
 
@@ -83,7 +83,7 @@ describe('./lib/typescript-overrides', () => {
     it('require "default" typescript if typescript option not specified', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(true)
 
@@ -104,7 +104,7 @@ describe('./lib/typescript-overrides', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
         '/path/to/user/typescript': userTypescript,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(true, '/path/to/user/typescript')
 
@@ -121,7 +121,7 @@ describe('./lib/typescript-overrides', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript,
         '/path/to/user/typescript': null,
-      })
+      }).default
 
       typescriptOverrides.overrideSourceMaps(true)
 
@@ -142,7 +142,7 @@ describe('./lib/typescript-overrides', () => {
     it('gracefully returns error when typescript cannot be required', () => {
       const typescriptOverrides = proxyquire('../../lib/typescript-overrides', {
         typescript: null,
-      })
+      }).default
 
       const err = typescriptOverrides.overrideSourceMaps(true)
 

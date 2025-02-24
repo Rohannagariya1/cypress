@@ -5,7 +5,7 @@ import * as events from 'events'
 import * as path from 'path'
 import webpack from 'webpack'
 import utils from './lib/utils'
-import { overrideSourceMaps } from './lib/typescript-overrides'
+import overrides from './lib/typescript-overrides'
 
 const debug = Debug('cypress:webpack')
 const debugStats = Debug('cypress:webpack:stats')
@@ -211,7 +211,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
     .tap((opts) => {
       if (opts.devtool === false) {
         // disable any overrides if we've explicitly turned off sourcemaps
-        overrideSourceMaps(false, options.typescript)
+        overrides.overrideSourceMaps(false, options.typescript)
 
         return
       }
@@ -221,7 +221,7 @@ const preprocessor: WebpackPreprocessor = (options: PreprocessorOptions = {}): F
       opts.devtool = 'inline-source-map'
 
       // override typescript to always generate proper source maps
-      overrideSourceMaps(true, options.typescript)
+      overrides.overrideSourceMaps(true, options.typescript)
 
       // To support dynamic imports, we have to disable any code splitting.
       debug('Limiting number of chunks to 1')

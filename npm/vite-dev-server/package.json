@@ -11,7 +11,7 @@
     "cypress:run-cypress-in-cypress": "cross-env CYPRESS_INTERNAL_E2E_TESTING_SELF_PARENT_PROJECT=1 HTTP_PROXY_TARGET_FOR_ORIGIN_REQUESTS=http://localhost:4455 CYPRESS_REMOTE_DEBUGGING_PORT=6666 TZ=America/New_York",
     "lint": "eslint --ext .js,.ts,.json, .",
     "test": "yarn test-unit",
-    "test-unit": "mocha -r ts-node/register/transpile-only --config ./test/.mocharc.js",
+    "test-unit": "mocha -r tsx/cjs --config ./test/.mocharc.js",
     "watch": "tsc -w"
   },
   "dependencies": {
@@ -26,7 +26,7 @@
     "dedent": "^0.7.0",
     "mocha": "^9.2.2",
     "sinon": "^13.0.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "vite-4": "npm:vite@^4.5.3",
     "vite-5": "npm:vite@^5.2.8",
     "vite-6": "npm:vite@^6.0.0",
