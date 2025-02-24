@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build": "ts-node ./scripts/build.ts && ts-node ./scripts/ico.ts",
+    "build": "tsx ./scripts/build.ts && tsx ./scripts/ico.ts",
     "check-ts": "tsc --noEmit && yarn -s tslint",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.json, .",
     "test": "yarn test-unit",

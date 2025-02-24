@@ -14,7 +14,7 @@
     "dev": "tsc --watch",
     "lint": "eslint --ext .js,.ts,.json, .",
     "test": "yarn test-unit",
-    "test-unit": "mocha -r ts-node/register/transpile-only --config ./test/.mocharc.js"
+    "test-unit": "mocha -r tsx/cjs --config ./test/.mocharc.js"
   },
   "dependencies": {
     "find-up": "6.3.0",
@@ -38,7 +38,7 @@
     "proxyquire": "2.1.3",
     "sinon": "^13.0.1",
     "snap-shot-it": "^7.9.6",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "webpack": "npm:webpack@^5",
     "webpack-4": "npm:webpack@^4",
     "webpack-dev-server-4": "npm:webpack-dev-server@^4"

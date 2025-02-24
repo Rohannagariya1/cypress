@@ -9,7 +9,7 @@ const getProgramOptions = (rootNamesOrOptions: CreateProgramOptions, options: Co
   return _.isArray(rootNamesOrOptions) ? options : rootNamesOrOptions.options
 }
 
-export const overrideSourceMaps = (sourceMap: boolean, typescriptPath?: string) => {
+const overrideSourceMaps = (sourceMap: boolean, typescriptPath?: string) => {
   try {
     if (patched) {
       debug('typescript.createProgram() already overridden')
@@ -58,4 +58,8 @@ export const overrideSourceMaps = (sourceMap: boolean, typescriptPath?: string) 
     // for testing purposes
     return err
   }
+}
+
+export default {
+  overrideSourceMaps,
 }
