@@ -1,5 +1,3 @@
-'use strict'
-
 const chai = require('chai')
 const mockery = require('mockery')
 const Promise = require('bluebird')
@@ -23,7 +21,7 @@ mockery.enable({
 mockery.registerMock('webpack', webpack)
 
 const preprocessor = require('../../index')
-const typescriptOverrides = require('../../lib/typescript-overrides')
+const typescriptOverrides = require('../../lib/typescript-overrides').default
 
 describe('webpack preprocessor', function () {
   beforeEach(function () {

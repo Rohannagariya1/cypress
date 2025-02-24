@@ -1,11 +1,10 @@
 import { expect, use } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import type { PuppeteerNode, Browser } from 'puppeteer-core'
+import type { PuppeteerNode, Browser, Page } from 'puppeteer-core'
 import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 import { MessageHandler } from '../../src/plugin/setup'
 import { setup } from '../../src/plugin'
-import * as activateMainTabExport from '../../src/plugin/activateMainTab'
 
 use(chaiAsPromised)
 use(sinonChai)
@@ -13,6 +12,7 @@ use(sinonChai)
 type StubbedMessageHandler = sinon.SinonStub<Parameters<MessageHandler>, ReturnType<MessageHandler>>
 
 describe('#setup', () => {
+  let mockPage: Partial<Page>
   let mockBrowser: Partial<Browser>
   let mockPuppeteer: Pick<PuppeteerNode, 'connect'>
   let on: sinon.SinonStub
@@ -30,9 +30,13 @@ describe('#setup', () => {
   }
 
   beforeEach(() => {
-    sinon.stub(activateMainTabExport, 'activateMainTab')
+    mockPage = {
+      evaluate: sinon.stub().resolves(),
+    }
+
     mockBrowser = {
       disconnect: sinon.stub().resolves(),
+      pages: sinon.stub().resolves([mockPage]),
     }
 
     mockPuppeteer = {
@@ -50,8 +54,6 @@ describe('#setup', () => {
 
   afterEach(() => {
     sinon.reset()
-
-    ;(activateMainTabExport.activateMainTab as sinon.SinonStub).restore()
   })
 
   it('registers `after:browser:launch` and `task` handlers', () => {
@@ -229,19 +231,18 @@ describe('#setup', () => {
       )
     })
 
-    it('calls activateMainTab if there is a page in the browser', async () => {
-      (activateMainTabExport.activateMainTab as sinon.SinonStub).withArgs(mockBrowser).resolves()
+    it('calls page.evaluate() if there is a page in the browser', async () => {
       setup({ on, onMessage, puppeteer: mockPuppeteer as PuppeteerNode })
       const task = getTask()
 
       simulateBrowserLaunch()
       await task({ name: testTask, args: [] })
 
-      expect(activateMainTabExport.activateMainTab).to.be.calledWith(mockBrowser)
+      expect(mockPage.evaluate).to.be.calledWith(sinon.match.func, 2000)
     })
 
     it('returns an error object if activateMainTab rejects', async () => {
-      (activateMainTabExport.activateMainTab as sinon.SinonStub).withArgs(mockBrowser).rejects()
+      mockBrowser.pages = sinon.stub().rejects(new Error('Failed to get pages'))
 
       setup({ on, onMessage, puppeteer: mockPuppeteer as PuppeteerNode })
       simulateBrowserLaunch()
@@ -263,7 +264,7 @@ describe('#setup', () => {
 
       await task({ name: testTask, args: [] })
 
-      expect(activateMainTabExport.activateMainTab).not.to.be.called
+      expect(mockPage.evaluate).not.to.be.called
     })
 
     it('does not try to activate main tab when the browser is electron', async () => {
@@ -272,7 +273,7 @@ describe('#setup', () => {
       const task = getTask()
 
       await task({ name: testTask, args: [] })
-      expect(activateMainTabExport.activateMainTab).not.to.be.called
+      expect(mockPage.evaluate).not.to.be.called
     })
   })
 
