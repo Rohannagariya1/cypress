@@ -88,7 +88,7 @@ export async function makePackage () {
       path.join(newDir, 'tsconfig.json'),
       JSON.stringify(
         {
-          'extends': '../ts/tsconfig.json',
+          'extends': '../../tsconfig.json',
           'include': ['src'],
           'exclude': [
             'test',

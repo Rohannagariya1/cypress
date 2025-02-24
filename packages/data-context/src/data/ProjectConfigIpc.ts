@@ -249,9 +249,6 @@ export class ProjectConfigIpc extends EventEmitter {
 
   private forkConfigProcess () {
     const configProcessArgs = ['--projectRoot', this.projectRoot, '--file', this.configFilePath]
-    // allow the use of tsx in subprocesses tests by removing the env constant from it
-    // without this line, packages/ts/register.js never registers the ts-node module for config and
-    // run_plugins can't use the config module.
     // we also do not want telemetry enabled within our cy-in-cy tests as it isn't configured to handled it
     const env = _.omit(process.env, 'CYPRESS_INTERNAL_E2E_TESTING_SELF', 'CYPRESS_INTERNAL_ENABLE_TELEMETRY')
 

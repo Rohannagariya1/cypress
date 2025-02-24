@@ -959,7 +959,8 @@ describe('config/src/project/utils', () => {
     })
 
     // @see https://github.com/cypress-io/cypress/issues/6892
-    it('warns if experimentalGetCookiesSameSite is passed', async function () {
+    it.only('warns if experimentalGetCookiesSameSite is passed', async function () {
+      debugger
       const warning = sinon.spy(errors, 'warning')
 
       await this.defaults('experimentalGetCookiesSameSite', true, {
