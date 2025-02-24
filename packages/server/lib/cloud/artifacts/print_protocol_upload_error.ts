@@ -8,8 +8,6 @@ const debug = Debug('cypress:server:cloud:artifacts')
 
 export const printProtocolUploadError = (error: Error) => {
   debug('protocol error: %O', error)
-  // eslint-disable-next-line no-console
-  console.log('')
   if ((error as AggregateError).errors) {
     errors.warning('CLOUD_PROTOCOL_UPLOAD_AGGREGATE_ERROR', error as AggregateError)
   } else if (HttpError.isHttpError(error)) {
