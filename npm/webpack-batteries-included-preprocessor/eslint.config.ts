@@ -3,7 +3,7 @@ import globals from 'globals'
 
 export default [
   ...defaultConfig,
-  { ignores: ['test/fixtures/**/*', 'index.js'] },
+  { ignores: ['test/fixtures/**/*', 'index.js', 'test/_test-output/**/*'] },
   {
   languageOptions: {
     parserOptions: {

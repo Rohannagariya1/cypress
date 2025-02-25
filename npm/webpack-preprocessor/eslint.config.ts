@@ -10,7 +10,7 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ['cypress.config.js', 'scripts/test-webpack-5.js'],
+          allowDefaultProject: ['cypress.config.js', 'scripts/test-webpack-5.js', 'eslint.config.ts'],
         },
       },
       globals: {
