@@ -1737,8 +1737,8 @@ describe('lib/cypress', () => {
 
     it('logs package.json and exits', async function () {
       await cypress.start(['--return-pkg'])
-
       const [loggedStr] = console.log.firstCall.args
+
       expect(JSON.parse(loggedStr)).to.deep.eq(pkg)
       this.expectExitWith(0)
     })
