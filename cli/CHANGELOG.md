@@ -6,6 +6,7 @@ _Released 3/11/2025 (PENDING)_
 **Dependency Updates:**
 
 - Upgraded `cli-table3` from `0.5.1` to `0.6.5`. Addressed in [#31166](https://github.com/cypress-io/cypress/pull/31166).
+- Upgraded `color-string` from `1.5.5` to `2.0.2`. Addressed in [#31176](https://github.com/cypress-io/cypress/pull/31176).
 
 ## 14.1.0
 
