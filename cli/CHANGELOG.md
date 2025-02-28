@@ -1,4 +1,13 @@
 <!-- See the ../guides/writing-the-cypress-changelog.md for details on writing the changelog. -->
+## 15.0.0
+
+_Released 07/01/2025 (PENDING)_
+
+**Breaking Changes:**
+
+- Removed support for [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol) with the [firefox](https://www.mozilla.org/) browser. Addresses []().
+
+
 ## 14.1.1
 
 _Released 3/11/2025 (PENDING)_
