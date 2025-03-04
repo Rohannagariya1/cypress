@@ -5,7 +5,7 @@ import Copy from 'rollup-plugin-copy'
 import Legacy from '@vitejs/plugin-legacy'
 import { resolve } from 'path'
 
-export default makeConfig({
+const config = makeConfig({
   optimizeDeps: {
     include: [
       'javascript-time-ago',
@@ -20,13 +20,13 @@ export default makeConfig({
       '@popperjs/core',
       '@opentelemetry/*',
     ],
-    esbuildOptions: { 
-      target: "ES2022" 
-    }
+    esbuildOptions: {
+      target: 'ES2022',
+    },
   },
   build: {
-    target: "ES2022"
-  }
+    target: 'ES2022',
+  },
 }, {
   plugins: [
     Layouts(),
@@ -44,3 +44,5 @@ export default makeConfig({
     }),
   ],
 })
+
+export default config
