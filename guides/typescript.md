@@ -1,33 +1,10 @@
-# TypeScript Migration
-
-## Success Criteria
-
-- No unnecessary `.js` in the repository
-- The repository passes linting based on the `@typescript-eslint/recommended-type-checked` rule set
-- The repository uses `@eslint/stylistic` to format
-- Optional / Stretch goal: Define a style guide for the repository that may extend past basic linting and formatting constraints. Initial thoughts:
-  - There are no circular dependencies
-  - There are no deep imports from undeclared exports
-
-## Preparation
-
-- Modernize linting on the repo - https://github.com/cypress-io/cypress/pull/30892
-  - Use eslint flat configs
-  - Use eslint stylistic plugins
-  - Remove tslint and use correlating typescript eslint plugins
-
-## Execution
-
-For shared language purposes, both packages and files can be categorized as "leaf," "shared," or "root" nodes.
-* A Leaf node has no monorepo dependencies
-* A Shared node depends on one or more nodes, and is the dependent of one or more node.
-* A Root node is not imported by any nodes other than `./cli`
+# Writing and Migrating To TypeScript
 
 ## Style Guidance
 
 In general, the [ts.dev](https://ts.dev/style/) style guide shall be adhered to as close as possible, with the caveat that end-of-line semiocolons are omitted unless necessary to prevent syntax errors.
 
-####  Type Definitions
+#### Type Definitions
 
 Prefer `interface` to `type` when possible. Interfaces are never inlined, which solves some potential issues with generated `.d.ts` files.
 
@@ -151,6 +128,23 @@ If you find yourself defining more than two very similar interfaces or types, co
 **Exception to DRY**:
 
 Type declarations composed for public API consumption & definition don't need to be as rigorously DRY'd. Readability and understandability is preferred over conciseness.
+
+## Migration Success Criteria
+
+- No unnecessary `.js` in the repository
+- The repository passes linting based on the `@typescript-eslint/recommended-type-checked` rule set
+- The repository uses `@eslint/stylistic` to format
+- Optional / Stretch goal: Define a style guide for the repository that may extend past basic linting and formatting constraints. Initial thoughts:
+  - There are no circular dependencies
+  - There are no deep imports from undeclared exports
+
+## Execution
+
+For shared language purposes, both packages and files can be categorized as "leaf," "shared," or "root" nodes.
+* A Leaf node has no monorepo dependencies
+* A Shared node depends on one or more nodes, and is the dependent of one or more node.
+* A Root node is not imported by any nodes other than `./cli`
+
 
 ### Stage 1: Typescript Shift
 
