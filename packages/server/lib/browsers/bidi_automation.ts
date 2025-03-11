@@ -217,9 +217,13 @@ export class BidiAutomation {
         })
       } catch (err: unknown) {
         // happens if you kill the Cypress app in the middle of request interception. This error can be ignored
+        debug(`request error Bidi %o`, err)
         if (!(err as Error)?.message.includes('no such request')) {
           throw err
         }
+
+        // try removing the prerequest?
+        this.automation.onRemoveBrowserPreRequest?.(params.request.request)
       }
     }
   }
