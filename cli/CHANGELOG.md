@@ -11,7 +11,7 @@ _Released 3/25/2025 (PENDING)_
 
 ## 14.2.0
 
-_Released 3/11/2025_
+_Released 3/12/2025_
 
 **Features:**
 
