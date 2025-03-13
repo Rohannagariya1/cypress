@@ -305,7 +305,8 @@ export class ProjectConfigIpc extends EventEmitter {
     // If they've got TypeScript installed, we can use
     // ts-node for CommonJS
     // ts-node/esm for ESM
-    if (hasTypeScriptInstalled(this.projectRoot)) {
+    // If we're in a cy in cy project, we will handle registering typescript directly in the server entry point
+    if (!process.env.CYPRESS_INTERNAL_E2E_TESTING_SELF_PARENT_PROJECT && hasTypeScriptInstalled(this.projectRoot)) {
       debug('found typescript in %s', this.projectRoot)
       if (isProjectUsingESModules) {
         debug(`using --experimental-specifier-resolution=node with --loader ${tsNodeEsm}`)
