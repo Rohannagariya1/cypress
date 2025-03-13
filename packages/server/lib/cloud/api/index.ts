@@ -6,14 +6,19 @@ const request = require('@cypress/request-promise')
 const humanInterval = require('human-interval')
 
 const RequestErrors = require('@cypress/request-promise/errors')
-const { agent } = require('@packages/network')
+
 const pkg = require('@packages/root')
 
 const machineId = require('../machine_id')
 const errors = require('../../errors')
-const { apiUrl, apiRoutes, makeRoutes } = require('../routes')
 
 import Bluebird from 'bluebird'
+
+import type { AfterSpecDurations } from '@packages/types'
+import { agent } from '@packages/network'
+import type { CombinedAgent } from '@packages/network/lib/agent'
+
+import { apiUrl, apiRoutes, makeRoutes } from '../routes'
 import { getText } from '../../util/status_code'
 import * as enc from '../encryption'
 import getEnvInformationForProjectRoot from '../environment'
@@ -22,7 +27,7 @@ import type { OptionsWithUrl } from 'request-promise'
 import { fs } from '../../util/fs'
 import ProtocolManager from '../protocol'
 import type { ProjectBase } from '../../project-base'
-import type { AfterSpecDurations } from '@packages/types'
+
 import { PUBLIC_KEY_VERSION } from '../constants'
 
 import { createInstance } from './create_instance'
@@ -227,6 +232,15 @@ const isRetriableError = (err) => {
     (err.statusCode == null)
 }
 
+function noproxyPreflightTimeout (): number {
+  try {
+    return !_.isUndefined(process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT) ?
+      Number(process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT) : SIXTY_SECONDS
+  } catch (e: unknown) {
+    return SIXTY_SECONDS
+  }
+}
+
 export type CreateRunOptions = {
   projectRoot: string
   ci: {
@@ -315,20 +329,6 @@ interface CachedPreflightResult {
 
 let preflightResult: DefaultPreflightResult | CachedPreflightResult = {
   encrypt: true,
-}
-
-function isCachedPreflightResult (x: any): x is CachedPreflightResult {
-  return x && (
-    _.isString(x.apiUrl) &&
-    (
-      _.isUndefined(x.warnings) ||
-      (
-        _.isArray(x.warnings) && x.warnings.reduce((prev: boolean, curr: any) => {
-          return curr && _.isString(curr.message)
-        }, true)
-      )
-    )
-  )
 }
 
 let recordRoutes = apiRoutes
@@ -598,21 +598,14 @@ export default {
   },
 
   sendPreflight (preflightInfo) {
-    if (preflightResult && isCachedPreflightResult(preflightResult)) {
-      debug('returning cached preflight result rather than re-issuing request', preflightResult)
-
-      return Bluebird.resolve(preflightResult)
-    }
-
     return retryWithBackoff(async (attemptIndex) => {
-      const { timeout, projectRoot } = preflightInfo
-
-      preflightInfo = _.omit(preflightInfo, 'timeout', 'projectRoot')
+      const { projectRoot, timeout, ...preflightRequestBody } = preflightInfo
 
       const preflightBaseProxy = apiUrl.replace('api', 'api-proxy')
 
       const envInformation = await getEnvInformationForProjectRoot(projectRoot, process.pid.toString())
-      const makeReq = ({ baseUrl, agent }) => {
+
+      const makeReq = (baseUrl: string, agent: CombinedAgent | null, timeout: number) => {
         return rp.post({
           url: `${baseUrl}preflight`,
           body: {
@@ -620,13 +613,13 @@ export default {
             envUrl: envInformation.envUrl,
             dependencies: envInformation.dependencies,
             errors: envInformation.errors,
-            ...preflightInfo,
+            ...preflightRequestBody,
           },
           headers: {
             'x-route-version': '1',
             'x-cypress-request-attempt': attemptIndex,
           },
-          timeout: timeout ?? SIXTY_SECONDS,
+          timeout,
           json: true,
           encrypt: 'always',
           agent,
@@ -638,14 +631,19 @@ export default {
       }
 
       const postReqs = async () => {
-        return makeReq({ baseUrl: preflightBaseProxy, agent: null })
-        .catch((err) => {
-          if (err.statusCode === 412) {
-            throw err
-          }
+        const initialPreflightTimeout = noproxyPreflightTimeout()
 
-          return makeReq({ baseUrl: apiUrl, agent })
-        })
+        if (initialPreflightTimeout >= 0) {
+          try {
+            return await makeReq(preflightBaseProxy, null, noproxyPreflightTimeout())
+          } catch (err) {
+            if (err.statusCode === 412) {
+              throw err
+            }
+          }
+        }
+
+        return makeReq(apiUrl, agent, timeout)
       }
 
       const result = await postReqs()

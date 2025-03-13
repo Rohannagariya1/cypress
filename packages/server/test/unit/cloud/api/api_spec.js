@@ -325,29 +325,75 @@ describe('lib/cloud/api', () => {
       })
     })
 
-    it('does not send network requests if there is a cached response', async () => {
-      const preflightResult = {
-        encrypt: false,
-        apiUrl: API_PROD_BASEURL,
-      }
-
-      prodApi.setPreflightResult(preflightResult)
-
-      preflightNock(API_PROD_PROXY_BASEURL)
-      .replyWithError('should not be requested')
-
-      preflightNock(API_PROD_BASEURL)
-      .replyWithError('should not be requested')
-
-      await expect(prodApi.sendPreflight({ projectId: 'abc123' })).to.eventually.deep.eq(preflightResult)
-    })
-
-    it('sets timeout to 60 seconds', () => {
+    it('sets timeout to 60 seconds when no CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT env is set', () => {
       sinon.stub(api.rp, 'post').resolves({})
 
       return api.sendPreflight({})
       .then(() => {
         expect(api.rp.post).to.be.calledWithMatch({ timeout: 60000 })
+      })
+    })
+
+    describe('when CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT env is set to a negative number', () => {
+      const configuredTimeout = -1
+      let prevEnv
+
+      beforeEach(() => {
+        prevEnv = process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT
+        process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT = configuredTimeout
+      })
+
+      afterEach(() => {
+        process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT = prevEnv
+      })
+
+      it('skips the no-agent preflight request', () => {
+        preflightNock(API_PROD_PROXY_BASEURL)
+        .replyWithError('should not be called')
+
+        preflightNock(API_PROD_BASEURL)
+        .reply(200, decryptReqBodyAndRespond({
+          reqBody: {
+            envUrl: 'https://some.server.com',
+            dependencies: {},
+            errors: [],
+            apiUrl: 'https://api.cypress.io/',
+            projectId: 'abc123',
+          },
+          resBody: {
+            encrypt: true,
+            apiUrl: `${API_PROD_BASEURL}/`,
+          },
+        }))
+
+        return prodApi.sendPreflight({ projectId: 'abc123' })
+        .then((ret) => {
+          expect(ret).to.deep.eq({ encrypt: true, apiUrl: `${API_PROD_BASEURL}/` })
+        })
+      })
+    })
+
+    describe('when CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT env is set to a positive number', () => {
+      const configuredTimeout = 10000
+      let prevEnv
+
+      beforeEach(() => {
+        prevEnv = process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT
+        process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT = configuredTimeout
+      })
+
+      afterEach(() => {
+        process.env.CYPRESS_NOPROXY_PREFLIGHT_TIMEOUT = prevEnv
+        api.rp.post.restore()
+      })
+
+      it('makes the initial request with the number set in the env', () => {
+        sinon.stub(api.rp, 'post').resolves({})
+
+        return api.sendPreflight({})
+        .then(() => {
+          expect(api.rp.post).to.be.calledWithMatch({ timeout: configuredTimeout })
+        })
       })
     })
 
