@@ -245,6 +245,8 @@ describe('lib/cloud/api', () => {
           require('../../../../lib/cloud/encryption')
         }, module)
       }
+
+      prodApi.resetPreflightResult()
     })
 
     it('POST /preflight to proxy. returns encryption', () => {
@@ -321,6 +323,23 @@ describe('lib/cloud/api', () => {
         scopeApi.done()
         expect(ret).to.deep.eq({ encrypt: true, apiUrl: `${API_PROD_BASEURL}/` })
       })
+    })
+
+    it('does not send network requests if there is a cached response', async () => {
+      const preflightResult = {
+        encrypt: false,
+        apiUrl: API_PROD_BASEURL,
+      }
+
+      prodApi.setPreflightResult(preflightResult)
+
+      preflightNock(API_PROD_PROXY_BASEURL)
+      .replyWithError('should not be requested')
+
+      preflightNock(API_PROD_BASEURL)
+      .replyWithError('should not be requested')
+
+      await expect(prodApi.sendPreflight({ projectId: 'abc123' })).to.eventually.deep.eq(preflightResult)
     })
 
     it('sets timeout to 60 seconds', () => {

@@ -299,9 +299,36 @@ type UpdateInstanceArtifactsOptions = {
   instanceId: string
   timeout?: number
 }
+interface DefaultPreflightResult {
+  encrypt: true
+}
 
-let preflightResult = {
+interface PreflightWarning {
+  message: string
+}
+
+interface CachedPreflightResult {
+  encrypt: boolean
+  apiUrl: string
+  warnings?: PreflightWarning[]
+}
+
+let preflightResult: DefaultPreflightResult | CachedPreflightResult = {
   encrypt: true,
+}
+
+function isCachedPreflightResult (x: any): x is CachedPreflightResult {
+  return x && (
+    _.isString(x.apiUrl) &&
+    (
+      _.isUndefined(x.warnings) ||
+      (
+        _.isArray(x.warnings) && x.warnings.reduce((prev: boolean, curr: any) => {
+          return curr && _.isString(curr.message)
+        }, true)
+      )
+    )
+  )
 }
 
 let recordRoutes = apiRoutes
@@ -571,6 +598,12 @@ export default {
   },
 
   sendPreflight (preflightInfo) {
+    if (preflightResult && isCachedPreflightResult(preflightResult)) {
+      debug('returning cached preflight result rather than re-issuing request', preflightResult)
+
+      return Bluebird.resolve(preflightResult)
+    }
+
     return retryWithBackoff(async (attemptIndex) => {
       const { timeout, projectRoot } = preflightInfo
 
