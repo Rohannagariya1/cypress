@@ -2,7 +2,7 @@
 
 ## Style Guidance
 
-In general, the [ts.dev](https://ts.dev/style/) style guide shall be adhered to as close as possible, with the caveat that end-of-line semiocolons are omitted unless necessary to prevent syntax errors.
+In general, the [ts.dev](https://ts.dev/style/) style guide shall be adhered to as close as possible, with the caveat that end-of-line semicolons are omitted unless necessary to prevent syntax errors.
 
 #### Type Definitions
 
