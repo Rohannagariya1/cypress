@@ -9,7 +9,7 @@ _Released 3/12/2025_
 
 **Bugfixes:**
 
-- Fixed an issue in `@cypress/webpack-batteries-included-preprocessor` where sourceMaps were not being set correctly in TypeScript 5. This should now make error code frames accurate for TypeScript 5 users. Fixes [#29614](https://github.com/cypress-io/cypress/issues/29614).
+- Fixed an issue in `@cypress/webpack-batteries-included-preprocessor` and `@cypress/webpack-preprocessor` where sourceMaps were not being set correctly in TypeScript 5. This should now make error code frames accurate for TypeScript 5 users. Fixes [#29614](https://github.com/cypress-io/cypress/issues/29614).
 
 **Misc:**
 
