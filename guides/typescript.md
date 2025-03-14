@@ -133,7 +133,7 @@ Type declarations composed for public API consumption & definition don't need to
 
 - No unnecessary `.js` in the repository
 - The repository passes linting based on the `@typescript-eslint/recommended-type-checked` rule set
-- The repository uses `@eslint/stylistic` to format
+- The repository uses modern eslint: [stylistic](https://eslint.style/) for formatting, various non-formatting-related plugins for code correctness, and the modern flat config pattern.
 - Optional / Stretch goal: Define a style guide for the repository that may extend past basic linting and formatting constraints. Initial thoughts:
   - There are no circular dependencies
   - There are no deep imports from undeclared exports
