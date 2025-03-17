@@ -2,7 +2,7 @@
 import { action, runInAction } from 'mobx'
 import { observer } from 'mobx-react'
 import cs from 'classnames'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 // @ts-ignore
 import EQ from 'css-element-queries/src/ElementQueries'
@@ -53,12 +53,11 @@ export interface SingleReporterProps extends BaseReporterProps{
 
 const Reporter: React.FC<SingleReporterProps> = observer(({ runner, className, error, runMode = 'single', studioEnabled, autoScrollingEnabled, isSpecsListOpen, resetStatsOnSpecChange, renderReporterHeader = (props: ReporterHeaderProps) => <Header {...props}/>, runnerStore }) => {
   const previousSpecRunId = usePrevious(runnerStore.specRunId)
-  const mounted = useRef<boolean>()
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    if (!mounted.current) {
+    if (!isMounted) {
       // do componentDidMount logic
-      mounted.current = true
 
       if (!runnerStore.spec) {
         throw Error(`Expected runnerStore.spec not to be null.`)
@@ -85,8 +84,11 @@ const Reporter: React.FC<SingleReporterProps> = observer(({ runner, className, e
       shortcuts.start()
       EQ.init()
       runnablesStore.setRunningSpec(runnerStore.spec.relative)
+      // we need to know when the test is mounted for our reporter tests. see
+      setIsMounted(true)
     } else {
       // do componentDidUpdate logic
+      // TODO: is this in the right place?
 
       if (!runnerStore.spec) {
         throw Error(`Expected runnerStore.spec not to be null.`)
@@ -110,6 +112,7 @@ const Reporter: React.FC<SingleReporterProps> = observer(({ runner, className, e
   return (
     <div className={cs(className, 'reporter', {
       'studio-active': appState.studioActive,
+      'mounted': isMounted,
     })}>
       {renderReporterHeader({ appState, statsStore, runnablesStore })}
       {appState?.isPreferencesMenuOpen ? (
