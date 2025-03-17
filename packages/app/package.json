@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "check-ts": "vue-tsc --noEmit && yarn -s tslint",
+    "check-ts": "vue-tsc --noEmit",
     "clean": "rimraf dist && echo 'cleaned'",
     "clean-deps": "rimraf node_modules",
     "cypress:launch": "yarn cypress:run-cypress-in-cypress gulp open --project .",
@@ -17,7 +17,6 @@
     "lint": "eslint .",
     "start": "echo \"run 'yarn dev' or 'yarn watch' from the root\" && exit 1",
     "test": "echo 'ok'",
-    "tslint": "tslint --config ../ts/tslint.json --project . --exclude ./src/router/router.ts, *.gen.ts",
     "watch": "echo \"run 'yarn dev' or 'yarn watch' from the root\" && exit 1"
   },
   "dependencies": {},

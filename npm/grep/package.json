@@ -14,8 +14,10 @@
     "globby": "^11.0.4"
   },
   "devDependencies": {
+    "@tooling/eslint-config": "0.0.0-development",
     "cypress-each": "^1.11.0",
     "cypress-expect": "^2.5.3",
+    "globals": "^15.14.0",
     "typescript": "~5.4.5"
   },
   "peerDependencies": {

@@ -10,7 +10,7 @@
 </template>
 
 <script>
-// @ts-nocheck
+// eslint-disable-next-line import-x/no-unresolved
 import './button.css'
 import { reactive, computed } from 'vue'
 

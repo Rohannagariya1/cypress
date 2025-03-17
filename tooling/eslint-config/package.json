@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@tooling/eslint-config",
-  "version": "0.0.1",
+  "version": "0.0.0-development",
   "main": "src/baseConfig.ts",
   "scripts": {
     "lint": "eslint ."
@@ -9,6 +9,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.25.1",
     "@eslint/js": "^9.18.0",
+    "@graphql-eslint/eslint-plugin": "^3",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "@typescript-eslint/parser": "7.2.0",
     "eslint": "^9.18.0",
@@ -19,6 +20,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-vue": "^9.32.0",
     "globals": "^15.14.0",
+    "@stylistic/eslint-plugin": "^2.13.0",
     "typescript-eslint": "^8.20.0"
   }
 }

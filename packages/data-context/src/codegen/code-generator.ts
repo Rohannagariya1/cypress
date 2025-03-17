@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra'
+import { constants as fsConstants } from 'fs'
 import { isBinaryFile } from 'isbinaryfile'
 import * as path from 'path'
 import * as ejs from 'ejs'
@@ -155,7 +156,7 @@ function frontMatter (content: string, args: { [key: string]: any }) {
 
 async function fileExists (absolute: string) {
   try {
-    await fs.access(absolute, fs.constants.F_OK)
+    await fs.access(absolute, fsConstants.F_OK)
 
     return true
   } catch (e) {

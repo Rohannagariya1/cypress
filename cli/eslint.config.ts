@@ -20,7 +20,7 @@
 }
 */
 import path from 'path'
-import { baseConfig } from '../eslint.config'
+import baseConfig from '../eslint.config'
 import globals from 'globals'
 
 export default [

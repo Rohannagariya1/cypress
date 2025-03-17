@@ -1,6 +1,6 @@
-// @ts-nocheck
 import React from 'react'
 import PropTypes from 'prop-types'
+// eslint-disable-next-line import-x/no-unresolved
 import './button.css'
 
 /**

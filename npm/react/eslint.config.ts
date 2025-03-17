@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '../../eslint.config'
 import globals from 'globals'
 import react from 'eslint-plugin-react'
 

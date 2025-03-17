@@ -18,15 +18,7 @@ export * from './browser'
 
 export type { PlatformName } from './platform'
 
-export {
-  BROWSER_FAMILY,
-} from './browser'
-
 export * from './config'
-
-export {
-  RESOLVED_FROM,
-} from './config'
 
 export * from './reporter'
 

@@ -464,9 +464,10 @@ describe('visual error templates', () => {
       return {
         default: [{
           runUrl: 'https://cloud.cypress.io/project/abcd/runs/1',
-          tag: '123',
+          tags: '123',
           group: 'foo',
           parallel: true,
+          ciBuildId: 'test-ciBuildId-123',
         }],
       }
     },
@@ -474,9 +475,10 @@ describe('visual error templates', () => {
       return {
         default: [{
           runUrl: 'https://cloud.cypress.io/project/abcd/runs/1',
-          tag: '123',
+          tags: '123',
           group: 'foo',
           parallel: true,
+          ciBuildId: 'test-ciBuildId-123',
         }],
       }
     },
@@ -484,9 +486,9 @@ describe('visual error templates', () => {
       return {
         default: [{
           runUrl: 'https://cloud.cypress.io/project/abcd/runs/1',
-          tag: '123',
+          tags: '123',
           group: 'foo',
-          parallel: true,
+          ciBuildId: 'test-ciBuildId-123',
         }],
       }
     },
@@ -563,9 +565,10 @@ describe('visual error templates', () => {
       return {
         default: [{
           runUrl: 'https://cloud.cypress.io/project/abcd/runs/1',
-          tag: '123',
+          tags: '123',
           group: 'foo',
           parallel: true,
+          ciBuildId: 'test-ciBuildId-123',
           autoCancelAfterFailures: 3,
         }],
       }

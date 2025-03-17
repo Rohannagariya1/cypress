@@ -1,4 +1,4 @@
-import * as sinon from 'sinon'
+import sinon from 'sinon'
 const { expect } = require('chai')
 const proxyquire = require('proxyquire').noPreserveCache()
 

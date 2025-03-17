@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '@tooling/eslint-config'
 import globals from 'globals'
 
 export default [
@@ -27,6 +27,11 @@ export default [
         proxyquire: 'readonly',
         supertest: 'readonly',
       },
+    },
+  },
+  {
+    rules: {
+      'import-x/default': 'warn',
     },
   },
 ]

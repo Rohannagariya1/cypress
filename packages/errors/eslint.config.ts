@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '../../eslint.config'
 
 export default [
   ...baseConfig,
@@ -12,6 +12,12 @@ export default [
           allowDefaultProject: ['eslint.config.ts', 'index.js'],
         },
       },
+    },
+  },
+  {
+    rules: {
+      '@stylistic/block-spacing': 'warn',
+      '@stylistic/object-curly-spacing': 'warn',
     },
   },
 ]

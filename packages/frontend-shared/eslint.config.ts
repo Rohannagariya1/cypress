@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '../../eslint.config'
 import globals from 'globals'
 import react from 'eslint-plugin-react'
 
@@ -36,6 +36,12 @@ export default [
         }
       }, {}),
       'react/no-unknown-property': 'off',
+    },
+  },
+  {
+    rules: {
+      'import-x/no-unresolved': 'warn',
+      'vue/no-v-html': 'warn',
     },
   },
 ]

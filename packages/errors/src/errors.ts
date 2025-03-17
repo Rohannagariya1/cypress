@@ -250,7 +250,7 @@ export const AllCypressErrors = {
 
         https://on.cypress.io/stale-run`
   },
-  CLOUD_ALREADY_COMPLETE: (props: {runUrl: string, tags: string, group: string, parallel: string, ciBuildId: string}) => {
+  CLOUD_ALREADY_COMPLETE: (props: {runUrl: string, tags: string, group: string, parallel: boolean, ciBuildId: string}) => {
     return errTemplate`\
         The run you are attempting to access is already complete and will not accept new groups.
 
@@ -258,12 +258,15 @@ export const AllCypressErrors = {
 
         When a run finishes all of its groups, it waits for a configurable set of time before finally completing. You must add more groups during that time period.
 
-        ${fmt.listFlags(props, {
-      tags: '--tag',
-      group: '--group',
-      parallel: '--parallel',
-      ciBuildId: '--ciBuildId',
-    })}
+        ${fmt.listFlags({
+          ...props,
+          parallel: String(props.parallel),
+         }, {
+          tags: '--tag',
+          group: '--group',
+          parallel: '--parallel',
+          ciBuildId: '--ciBuildId',
+        })}
 
         https://on.cypress.io/already-complete`
   },
@@ -381,19 +384,23 @@ export const AllCypressErrors = {
 
       ${fmt.off(arg1.link)}`
   },
-  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: {runUrl: string, tags: string, group: string, parallel: string, ciBuildId: string, autoCancelAfterFailures: string }) => {
+  CLOUD_AUTO_CANCEL_MISMATCH: (arg1: {runUrl: string, tags: string, group: string, parallel: boolean, ciBuildId: string, autoCancelAfterFailures: number }) => {
     return errTemplate`\
         You passed the ${fmt.flag(`--auto-cancel-after-failures`)} flag, but this run originally started with a different value for the ${fmt.flag(`--auto-cancel-after-failures`)} flag.
 
         The existing run is: ${fmt.url(arg1.runUrl)}
 
-        ${fmt.listFlags(arg1, {
-      tags: '--tag',
-      group: '--group',
-      parallel: '--parallel',
-      ciBuildId: '--ciBuildId',
-      autoCancelAfterFailures: '--auto-cancel-after-failures',
-    })}
+        ${fmt.listFlags({
+          ...arg1,
+          parallel: String(arg1.parallel),
+          autoCancelAfterFailures: String(arg1.autoCancelAfterFailures),
+        }, {
+          tags: '--tag',
+          group: '--group',
+          parallel: '--parallel',
+          ciBuildId: '--ciBuildId',
+          autoCancelAfterFailures: '--auto-cancel-after-failures',
+        })}
 
         The first setting of --auto-cancel-after-failures for any given run takes precedent.
 

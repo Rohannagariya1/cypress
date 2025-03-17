@@ -1,4 +1,5 @@
 import { mount } from '@cypress/vue'
+// eslint-disable-next-line import-x/no-unresolved
 import '/node_modules/tailwindcss/dist/tailwind.min.css'
 
 // example comes from https://tailwindcss.com/components/cards/#horizontal

@@ -133,9 +133,9 @@ export class ProjectConfigIpc extends EventEmitter {
   /**
    * When
    */
-  once(evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
-  once(evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
-  once(evt: 'file:preprocessor:overridden', listener: (payload: { handlerText: string }) => void): this
+  once (evt: 'setupTestingType:reply', listener: (payload: SetupNodeEventsReply) => void): this
+  once (evt: 'setupTestingType:error', listener: (error: CypressError) => void): this
+  once (evt: 'file:preprocessor:overridden', listener: (payload: { handlerText: string }) => void): this
   once (evt: string, listener: (...args: any[]) => void) {
     return super.once(evt, listener)
   }

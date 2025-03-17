@@ -236,6 +236,8 @@ export default <InfiniteDepthConfigWithExtends[]>[
       // these are generally noisy, and not that helpful at this point. Maybe
       // down the line we can enable them.
       'import-x/no-named-as-default-member': 'off',
+      'import-x/default': 'warn',
+      'import-x/namespace': 'warn',
     },
   },
 

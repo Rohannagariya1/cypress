@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '../../eslint.config'
 import path from 'path'
 import globals from 'globals'
 

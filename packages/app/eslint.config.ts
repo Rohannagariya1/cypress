@@ -1,4 +1,4 @@
-import { baseConfig } from '../../eslint.config'
+import baseConfig from '@tooling/eslint-config'
 import globals from 'globals'
 import react from 'eslint-plugin-react'
 
@@ -45,6 +45,13 @@ export default [
         }
       }, {}),
       'react/no-unknown-property': 'off',
+    },
+  },
+
+  {
+    rules: {
+      // TODO: configure import-x so that it doesn't error on importing svg, css, etc
+      'import-x/no-unresolved': 'warn',
     },
   },
 ]

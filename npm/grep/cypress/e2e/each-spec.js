@@ -1,6 +1,5 @@
-/// <reference types="cypress" />
-
 // https://github.com/bahmutov/cypress-each
+// eslint-disable-next-line import-x/no-unresolved
 import 'cypress-each'
 
 describe('tests that use .each work', () => {
