@@ -157,6 +157,31 @@ async function executeBeforeBrowserLaunch (browser, launchOptions: typeof defaul
   return launchOptions
 }
 
+async function chmodRecursive (directoryPath, mode) {
+  try {
+    // Read the contents of the directory
+    const files = await fs.readdir(directoryPath)
+
+    // Loop through the contents
+    for (const file of files) {
+      const filePath = path.join(directoryPath, file)
+
+      // Get stats of the current file or directory
+      const stat = await fs.lstat(filePath)
+
+      if (stat.isDirectory()) {
+        // If it's a directory, recursively change permissions inside
+        await chmodRecursive(filePath, mode)
+      }
+
+      // Change the permissions for the file or directory
+      await fs.chmod(filePath, mode)
+    }
+  } catch (err) {
+    debug('Error changing permissions for %s: %o', directoryPath, err)
+  }
+}
+
 interface AfterBrowserLaunchDetails {
   webSocketDebuggerUrl: string | never
 }
@@ -535,8 +560,8 @@ export = {
       .then(() => {
         debug('copied extension')
 
-        // ensure write access before overwriting
-        return fs.chmod(extensionBg, 0o0644)
+        // ensure write/read/execute access to the directory before overwriting
+        return chmodRecursive(extensionDest, 0o0777)
       })
       .then(() => {
         // and overwrite background.js with the final string bytes
