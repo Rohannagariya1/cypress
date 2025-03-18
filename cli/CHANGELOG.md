@@ -5,8 +5,8 @@ _Released 3/25/2025 (PENDING)_
 
 **Dependency Updates:**
 
-- Upgraded `systeminformation`
-from `5.21.7` to `5.22.8`. Addressed in [#31281](https://github.com/cypress-io/cypress/pull/31281).
+- Upgraded `systeminformation` from `5.21.7` to `5.22.8`. Addressed in [#31281](https://github.com/cypress-io/cypress/pull/31281).
+- Upgraded `webdriver` from `9.7.3` to `9.11.0`. Addressed in [#31315](https://github.com/cypress-io/cypress/pull/31315).
 
 ## 14.2.0
 
