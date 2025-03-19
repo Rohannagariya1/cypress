@@ -55,7 +55,7 @@ module.exports = {
       if(event !== 'after:screenshot'){
         await handleHook(event, args);
       } else {
-        debug(`[${hook}]: Skipping sending ${JSON.stringify(args)} because it is disabled in backend`)
+        debug(`[${event}]: Skipping sending ${JSON.stringify(args)} because it is disabled in backend`)
       }     
 
       return ipc.send(`promise:fulfilled:${ids.invocationId}`, null, value)
