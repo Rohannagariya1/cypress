@@ -170,6 +170,7 @@ class RunPlugins {
       case 'before:spec':
       case 'after:run':
       case 'after:spec':
+      case 'after:screenshot':
       case '_after:spec:stdout':
       case '_before:spec:runnable':
       case '_process:cross:origin:callback':
@@ -184,9 +185,6 @@ class RunPlugins {
         return browserLaunch.wrapBefore(this.ipc, this.invoke, ids, args)
       case 'after:browser:launch':
         return util.wrapChildPromise(this.ipc, this.invoke, ids, args)
-      case 'after:screenshot':
-        debug('Skipping after:screenshot event');
-        return Promise.resolve();
       default:
         debug('unexpected execute message:', event, args)
 

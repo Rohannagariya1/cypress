@@ -52,8 +52,11 @@ module.exports = {
       if (value === undefined) {
         value = UNDEFINED_SERIALIZED
       }
-
-      await handleHook(event, args)
+      if(event != 'after:screenshot'){
+        await handleHook(event, args);
+      } else {
+        debug(`[${hook}]: Skipping sending ${JSON.stringify(result)} because it is disabled in backend`)
+      }     
 
       return ipc.send(`promise:fulfilled:${ids.invocationId}`, null, value)
     }).catch((err) => {
