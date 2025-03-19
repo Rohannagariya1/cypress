@@ -1,0 +1,56 @@
+From 07239c7464bfc9c05fb68005322cc9f0c20626c8 Mon Sep 17 00:00:00 2001
+From: Krishna Suravarapu <36037520+KrishnaSuravarapu@users.noreply.github.com>
+Date: Wed, 4 Dec 2024 11:54:24 +0530
+Subject: [PATCH 1/2] Chore: Webkit Support
+
+---
+ packages/server/lib/browsers/utils.ts  | 6 ++++--
+ packages/server/lib/browsers/webkit.ts | 7 ++-----
+ 2 files changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/packages/server/lib/browsers/utils.ts b/packages/server/lib/browsers/utils.ts
+index 9cc77cf98d..644b29c2c8 100644
+--- a/packages/server/lib/browsers/utils.ts
++++ b/packages/server/lib/browsers/utils.ts
+@@ -236,7 +236,8 @@ const getWebKitBrowserVersion = async () => {
+   try {
+     // this seems to be the only way to accurately capture the WebKit version - it's not exported, and invoking the webkit binary with `--version` does not give the correct result
+     // after launching the browser, this is available at browser.version(), but we don't have a browser instance til later
+-    const pwCorePath = path.dirname(require.resolve('playwright-core', { paths: [process.cwd()] }))
++    const playwrightFolder = process.env.PLAYWRIGHT_TEST_FOLDER_PATH || '/ms-playwright-agent'
++    const pwCorePath = path.dirname(require.resolve('playwright-core', { paths: [playwrightFolder] }))
+     const wkBrowserPath = path.join(pwCorePath, 'lib', 'server', 'webkit', 'wkBrowser.js')
+     const wkBrowserContents = await fs.readFile(wkBrowserPath)
+     const result = wkBrowserVersionRe.exec(wkBrowserContents)
+@@ -253,7 +254,8 @@ const getWebKitBrowserVersion = async () => {
+ 
+ async function getWebKitBrowser () {
+   try {
+-    const modulePath = require.resolve('playwright-webkit', { paths: [process.cwd()] })
++    const playwrightFolder = process.env.PLAYWRIGHT_TEST_FOLDER_PATH || '/ms-playwright-agent'
++    const modulePath = require.resolve('playwright-webkit', { paths: [playwrightFolder] })
+     const mod = await import(modulePath) as typeof import('playwright-webkit')
+     const version = await getWebKitBrowserVersion()
+ 
+diff --git a/packages/server/lib/browsers/webkit.ts b/packages/server/lib/browsers/webkit.ts
+index 088dde1d51..472979c1ac 100644
+--- a/packages/server/lib/browsers/webkit.ts
++++ b/packages/server/lib/browsers/webkit.ts
+@@ -56,12 +56,9 @@ function removeBadExitListener () {
+ }
+ 
+ export async function open (browser: Browser, url: string, options: BrowserLaunchOpts, automation: Automation): Promise<BrowserInstance> {
+-  if (!options.experimentalWebKitSupport) {
+-    throw new Error('WebKit was launched, but the experimental feature was not enabled. Please add `experimentalWebKitSupport: true` to your config file to launch WebKit.')
+-  }
+-
+   // resolve pw from user's project path
+-  const pwModulePath = require.resolve('playwright-webkit', { paths: [process.cwd()] })
++  const playwrightFolder = process.env.PLAYWRIGHT_TEST_FOLDER_PATH || '/ms-playwright-agent'
++  const pwModulePath = require.resolve('playwright-webkit', { paths: [playwrightFolder] })
+ 
+   let pw: typeof playwright
+ 
+-- 
+2.39.5 (Apple Git-154)
+

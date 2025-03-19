@@ -1,0 +1,207 @@
+From 1f58fc6a4651d32b809fd818059fb99b5230e22e Mon Sep 17 00:00:00 2001
+From: Krishna Suravarapu <36037520+KrishnaSuravarapu@users.noreply.github.com>
+Date: Wed, 4 Dec 2024 11:55:24 +0530
+Subject: [PATCH 2/2] Chore: Turboscale Handling
+
+---
+ packages/server/lib/modes/run.ts              | 13 +++-
+ .../server/lib/plugins/child/run_plugins.js   | 15 ++++-
+ .../server/lib/plugins/child/turboscale.js    | 63 +++++++++++++++++++
+ .../lib/plugins/child/validate_event.js       |  2 +
+ packages/server/lib/project-base.ts           |  4 ++
+ 5 files changed, 94 insertions(+), 3 deletions(-)
+ create mode 100644 packages/server/lib/plugins/child/turboscale.js
+
+diff --git a/packages/server/lib/modes/run.ts b/packages/server/lib/modes/run.ts
+index 5dec728b95..1678ffbc38 100644
+--- a/packages/server/lib/modes/run.ts
++++ b/packages/server/lib/modes/run.ts
+@@ -28,6 +28,9 @@ import type { ProtocolManager } from '../cloud/protocol'
+ import { telemetry } from '@packages/telemetry'
+ import { CypressRunResult, createPublicBrowser, createPublicConfig, createPublicRunResults, createPublicSpec, createPublicSpecResults } from './results'
+ import { EarlyExitTerminator } from '../util/graceful_crash_handling'
++const capture = require('../capture')
++
++let captured = capture.stdout
+ 
+ type SetScreenshotMetadata = (data: TakeScreenshotProps) => void
+ type ScreenshotMetadata = ReturnType<typeof screenshotMetadata>
+@@ -703,6 +706,11 @@ async function waitForTestsToFinishRunning (options: { project: Project, screens
+     results.video = null
+   }
+ 
++  if (captured) {
++    debug(`_after:spec:stdout called`)
++    await runEvents.execute('_after:spec:stdout', { publicSpec, stdout: captured.toString(), spec, results })
++  }
++
+   // the early exit terminator persists between specs,
+   // so if this spec crashed, the next one will report as
+   // a crash too unless it is reset. Would like to not rely
+@@ -765,6 +773,9 @@ async function runSpecs (options: { config: Cfg, browser: Browser, sys: any, hea
+       firstSpec: isFirstSpecInBrowser,
+     })
+ 
++    capture.restore()
++    captured = capture.stdout()
++
+     await protocolManager?.beforeSpec({
+       ...spec,
+       instanceId,
+@@ -1061,8 +1072,6 @@ async function ready (options: ReadyOptions) {
+       socketId,
+       parallel,
+       onError,
+-      // TODO: refactor this so that augmenting the browser object here is not needed and there is no type conflict
+-      // @ts-expect-error runSpecs augments browser with isHeadless and isHeaded, which is "missing" from the type here
+       browser,
+       project,
+       runUrl,
+diff --git a/packages/server/lib/plugins/child/run_plugins.js b/packages/server/lib/plugins/child/run_plugins.js
+index 0e43951986..0b919d193f 100644
+--- a/packages/server/lib/plugins/child/run_plugins.js
++++ b/packages/server/lib/plugins/child/run_plugins.js
+@@ -13,6 +13,7 @@ const devServer = require('./dev-server')
+ const resolve = require('../../util/resolve')
+ const browserLaunch = require('./browser_launch')
+ const util = require('../util')
++const turboscale = require('./turboscale')
+ const validateEvent = require('./validate_event')
+ const crossOrigin = require('./cross_origin')
+ 
+@@ -126,6 +127,16 @@ class RunPlugins {
+         debug('register default preprocessor')
+         registerChildEvent('file:preprocessor', this._getDefaultPreprocessor(initialConfig))
+       }
++
++      const turboscaleEventNames = ['before:run', 'before:spec', 'after:run', 'after:spec', 'after:screenshot', '_after:spec:stdout', '_before:spec:runnable']
++
++      turboscaleEventNames.forEach((eventName) => {
++        if (!this.registeredEventsByName[eventName]) {
++          registerChildEvent(eventName, (...args) => {
++            return args
++          })
++        }
++      })
+     })
+     .then((modifiedCfg) => {
+       debug('plugins file successfully loaded')
+@@ -160,8 +171,10 @@ class RunPlugins {
+       case 'after:run':
+       case 'after:spec':
+       case 'after:screenshot':
++      case '_after:spec:stdout':
++      case '_before:spec:runnable':
+       case '_process:cross:origin:callback':
+-        return util.wrapChildPromise(this.ipc, this.invoke, ids, args)
++        return turboscale.wrapChildPromiseTurboscale(this.ipc, this.invoke, ids, args, event)
+       case 'task':
+         return this.taskExecute(ids, args)
+       case '_get:task:keys':
+diff --git a/packages/server/lib/plugins/child/turboscale.js b/packages/server/lib/plugins/child/turboscale.js
+new file mode 100644
+index 0000000000..71fda2303b
+--- /dev/null
++++ b/packages/server/lib/plugins/child/turboscale.js
+@@ -0,0 +1,63 @@
++const _ = require('lodash')
++const Promise = require('bluebird')
++
++const request = require('../../request')()
++const debug = require('debug')('cypress:server:turboscale')
++const UNDEFINED_SERIALIZED = '__cypress_undefined__'
++
++const serializeError = (err) => {
++  const obj = _.pick(err,
++    'name', 'message', 'stack', 'code', 'annotated', 'type',
++    'details', 'isCypressErr', 'messageMarkdown',
++    'originalError',
++    // Location of the error when a TSError or a esbuild error occurs (parse error from ts-node or esbuild)
++    'compilerErrorLocation')
++
++  if (obj.originalError) {
++    obj.originalError = serializeError(obj.originalError)
++  }
++
++  return obj
++}
++
++const handleHook = async (hook, result) => {
++  try {
++    let options = {
++      method: 'POST',
++      uri: 'http://localhost:8000/cypress/',
++      body: {
++        result,
++        hook,
++      },
++      json: true,
++    }
++
++    debug(`[${hook}]: Sending ${JSON.stringify(result)} to ${options.uri}`)
++    await request.rp(options)
++  } catch (err) {
++    debug(`[${hook}]: Error in sending ${JSON.stringify(result)}. Error: ${err.message}: ${err.stack}`)
++  }
++}
++
++module.exports = {
++  wrapChildPromiseTurboscale (ipc, invoke, ids, args = [], event) {
++    return Promise.try(() => {
++      debug(`args is ${JSON.stringify(args)}`)
++
++      return invoke(ids.eventId, args)
++    })
++    .then(async (value) => {
++      // undefined is coerced into null when sent over ipc, but we need
++      // to differentiate between them for 'task' event
++      if (value === undefined) {
++        value = UNDEFINED_SERIALIZED
++      }
++
++      await handleHook(event, args)
++
++      return ipc.send(`promise:fulfilled:${ids.invocationId}`, null, value)
++    }).catch((err) => {
++      return ipc.send(`promise:fulfilled:${ids.invocationId}`, serializeError(err))
++    })
++  },
++}
+diff --git a/packages/server/lib/plugins/child/validate_event.js b/packages/server/lib/plugins/child/validate_event.js
+index 2c88326825..632a78225d 100644
+--- a/packages/server/lib/plugins/child/validate_event.js
++++ b/packages/server/lib/plugins/child/validate_event.js
+@@ -27,6 +27,8 @@ const eventValidators = {
+   '_get:task:body': isFunction,
+   '_get:task:keys': isFunction,
+   '_process:cross:origin:callback': isFunction,
++  '_after:spec:stdout': isFunction,
++  '_before:spec:runnable': isFunction,
+   'after:browser:launch': isFunction,
+   'after:run': isFunction,
+   'after:screenshot': isFunction,
+diff --git a/packages/server/lib/project-base.ts b/packages/server/lib/project-base.ts
+index 39403ade4b..cfb9e20084 100644
+--- a/packages/server/lib/project-base.ts
++++ b/packages/server/lib/project-base.ts
+@@ -25,6 +25,7 @@ import type ProtocolManager from './cloud/protocol'
+ import { ServerBase } from './server-base'
+ import type Protocol from 'devtools-protocol'
+ import type { ServiceWorkerClientEvent } from '@packages/proxy/lib/http/util/service-worker-manager'
++import { flattenSuiteIntoRunnables } from './util/tests_utils'
+ 
+ export interface Cfg extends ReceivedCypressOptions {
+   projectId?: string
+@@ -389,6 +390,9 @@ export class ProjectBase extends EE {
+ 
+       onTestsReceivedAndMaybeRecord: async (runnables: unknown[], cb: () => void) => {
+         debug('received runnables %o', runnables)
++        const r = flattenSuiteIntoRunnables(runnables)
++
++        runEvents.execute('_before:spec:runnable', { specFile: runnables.file, tests: r[0], hooks: r[1] })
+ 
+         if (reporterInstance) {
+           reporterInstance.setRunnables(runnables, this.getConfig())
+-- 
+2.39.5 (Apple Git-154)
+
