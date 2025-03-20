@@ -36,6 +36,7 @@ export function setupFullConfigWithDefaults (obj: any = {}, getFilesByGlob: any)
   config.projectRoot = projectRoot
   config.projectName = projectName
   config.repoRoot = repoRoot
+  options.specTimeout = process.env.CYPRESS_SPEC_TIMEOUT
 
   // @ts-ignore
   return mergeDefaults(config, options, cliConfig, getFilesByGlob)

@@ -370,7 +370,7 @@ export function mergeDefaults (
 
   config.rawJson = _.cloneDeep(config)
 
-  _.extend(config, _.pick(options, 'configFile', 'morgan', 'isTextTerminal', 'socketId', 'report', 'browsers'))
+  _.extend(config, _.pick(options, 'configFile', 'morgan', 'isTextTerminal', 'socketId', 'report', 'browsers', 'specTimeout'))
   debug('merged config with options, got %o', config)
 
   _

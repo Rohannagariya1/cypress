@@ -403,6 +403,7 @@ class $Cypress {
     // other objects communicate intent
     // and 'action' to Cypress
     debug(eventName)
+    let specTimer
     switch (eventName) {
       case 'recorder:frame':
         return this.emit('recorder:frame', args[0])
@@ -417,6 +418,9 @@ class $Cypress {
 
       case 'runner:start':
         // mocha runner has begun running the tests
+        specTimer = setTimeout((_this) => {
+          _this.emit('mocha', 'end', { end: new Date(), specTimeout: true });
+        }, Number(this.config('specTimeout')), this)
         this.emit('run:start')
 
         if (this.runner.getResumedAtTestIndex() !== null) {
@@ -434,6 +438,7 @@ class $Cypress {
       case 'runner:end':
         $sourceMapUtils.destroySourceMapConsumers()
 
+        clearTimeout(specTimer)
         telemetry.getSpan('cypress:app')?.end()
 
         // mocha runner has finished running the tests
